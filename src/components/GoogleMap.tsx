@@ -28,7 +28,9 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
       });
 
       try {
+        console.log("Chargement de Google Maps API...");
         await loader.load();
+        console.log("Google Maps API chargé avec succès");
         
         if (mapRef.current) {
           const mapInstance = new google.maps.Map(mapRef.current, {
