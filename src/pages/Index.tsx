@@ -150,7 +150,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="min-h-screen bg-black relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Full Screen Map */}
       <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
         <GoogleMap
