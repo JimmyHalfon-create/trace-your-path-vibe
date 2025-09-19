@@ -150,20 +150,9 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      {/* Header */}
-      <div className="p-4 border-b border-border flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">TRACE</h1>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Globe className="w-4 h-4 mr-1" />
-            Mappemonde
-          </div>
-        </div>
-      </div>
-
-      {/* Map Container */}
-      <div className="flex-1 relative">
+    <div className="min-h-screen bg-background relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Full Screen Map */}
+      <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
         <GoogleMap
           center={location}
           zoom={15}
@@ -172,6 +161,20 @@ const Index = () => {
             setLocation(newLocation);
           }}
         />
+      </div>
+
+      {/* Floating Header */}
+      <div className="absolute top-4 left-4 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 1rem)` }}>
+        <Card className="p-3 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-primary">TRACE</h1>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Globe className="w-4 h-4 mr-1" />
+              Mappemonde
+            </div>
+          </div>
+        </Card>
+      </div>
 
         {/* Floating Action Button */}
         <div className="absolute bottom-6 left-6 right-6 z-10">
@@ -220,19 +223,18 @@ const Index = () => {
           )}
         </div>
 
-        {/* Traces Count Indicator */}
-        <div className="absolute top-4 right-4 z-10">
-          <Card className="p-2 shadow-lg">
-            <div className="flex items-center gap-2 text-sm">
-              <MessageSquare className="w-4 h-4 text-primary" />
-              <span className="font-medium">{traces.length}</span>
-              <span className="text-muted-foreground">traces</span>
-              {isLoading && (
-                <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
-              )}
-            </div>
-          </Card>
-        </div>
+      {/* Traces Count Indicator */}
+      <div className="absolute top-20 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 5rem)` }}>
+        <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
+          <div className="flex items-center gap-2 text-sm">
+            <MessageSquare className="w-4 h-4 text-primary" />
+            <span className="font-medium">{traces.length}</span>
+            <span className="text-muted-foreground">traces</span>
+            {isLoading && (
+              <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );
