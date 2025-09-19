@@ -147,6 +147,15 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       cross.style.pointerEvents = 'none';
       el.appendChild(cross);
       
+      // Add click event to zoom on trace
+      el.addEventListener('click', () => {
+        map.current?.flyTo({
+          center: [trace.longitude, trace.latitude],
+          zoom: 15,
+          duration: 2000
+        });
+      });
+      
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
