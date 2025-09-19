@@ -150,7 +150,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Header */}
       <div className="p-4 border-b border-border flex-shrink-0">
         <div className="flex items-center justify-between">
