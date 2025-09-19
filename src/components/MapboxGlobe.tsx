@@ -20,15 +20,14 @@ interface MapboxGlobeProps {
 const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [apiKey, setApiKey] = useState('');
-  const [isKeySet, setIsKeySet] = useState(false);
   const markers = useRef<mapboxgl.Marker[]>([]);
+  const MAPBOX_TOKEN = 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21mcW5heHk2MDBnMDJpczk0czdvOXUzNSJ9.Y4ToOLdwjWzuJxIn_v9EBg';
 
   useEffect(() => {
-    if (!mapContainer.current || !isKeySet) return;
+    if (!mapContainer.current) return;
 
     // Initialize map
-    mapboxgl.accessToken = apiKey;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -104,11 +103,11 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       markers.current = [];
       map.current?.remove();
     };
-  }, [isKeySet, apiKey, center.lat, center.lng, onGlobeClick]);
+  }, [center.lat, center.lng, onGlobeClick]);
 
   // Update markers when traces change
   useEffect(() => {
-    if (!map.current || !isKeySet) return;
+    if (!map.current) return;
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
@@ -134,44 +133,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         .addTo(map.current!);
       markers.current.push(marker);
     });
-  }, [traces, center, isKeySet]);
-
-  if (!isKeySet) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <Card className="p-6 max-w-md mx-auto bg-background/90 backdrop-blur-sm">
-          <h3 className="text-lg font-semibold mb-4">Mapbox Token Required</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Pour afficher le globe avec les vraies cartes, veuillez entrer votre token public Mapbox.
-            Obtenez-le sur{' '}
-            <a 
-              href="https://mapbox.com/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              mapbox.com
-            </a>
-          </p>
-          <div className="space-y-3">
-            <Input
-              type="text"
-              placeholder="pk.eyJ1Ijoi..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-            <Button 
-              onClick={() => setIsKeySet(true)}
-              disabled={!apiKey.startsWith('pk.')}
-              className="w-full"
-            >
-              Charger le Globe
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  }, [traces, center]);
 
   return (
     <div className="w-full h-full">
