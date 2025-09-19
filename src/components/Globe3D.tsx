@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame, useLoader, ThreeEvent } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
+import { useRef } from 'react';
+import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface Globe3DProps {
@@ -37,9 +37,6 @@ const vector3ToLatLng = (position: THREE.Vector3) => {
 
 const EarthSphere = ({ onGlobeClick, traces = [] }: { onGlobeClick?: Globe3DProps['onGlobeClick'], traces: Globe3DProps['traces'] }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const [earthTexture] = useLoader(THREE.TextureLoader, [
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Land_ocean_ice_cloud_1024.jpg/1024px-Land_ocean_ice_cloud_1024.jpg'
-  ]);
 
   // Auto-rotation
   useFrame((state, delta) => {
@@ -59,31 +56,28 @@ const EarthSphere = ({ onGlobeClick, traces = [] }: { onGlobeClick?: Globe3DProp
 
   return (
     <group>
-      {/* Earth */}
+      {/* Earth - simple colored sphere */}
       <mesh ref={meshRef} onClick={handleClick}>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial map={earthTexture} />
+        <meshStandardMaterial 
+          color="#1e40af" 
+          roughness={0.8}
+          metalness={0.2}
+        />
       </mesh>
 
       {/* Traces markers */}
       {traces.map((trace) => {
-        const position = latLngToVector3(trace.latitude, trace.longitude, 1.02);
+        const position = latLngToVector3(trace.latitude, trace.longitude, 1.05);
         return (
-          <group key={trace.id}>
-            <mesh position={position}>
-              <sphereGeometry args={[0.02, 8, 8]} />
-              <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.3} />
-            </mesh>
-            <Text
-              position={[position.x * 1.1, position.y * 1.1, position.z * 1.1]}
-              fontSize={0.05}
-              color="#fbbf24"
-              anchorX="center"
-              anchorY="middle"
-            >
-              {trace.message.substring(0, 20)}...
-            </Text>
-          </group>
+          <mesh key={trace.id} position={position}>
+            <sphereGeometry args={[0.02, 8, 8]} />
+            <meshStandardMaterial 
+              color="#fbbf24" 
+              emissive="#fbbf24" 
+              emissiveIntensity={0.5} 
+            />
+          </mesh>
         );
       })}
     </group>
