@@ -20,12 +20,15 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
 
   useEffect(() => {
+    console.log("GoogleMap useEffect déclenché, center:", center);
     const initMap = async () => {
+      console.log("Initialisation de la carte...");
       const loader = new Loader({
         apiKey: "AIzaSyA1I3Y6cWJgIv0ln6Qe5R_ifHSH4oGEaTE",
         version: "weekly",
         libraries: ["places"]
       });
+      console.log("Loader Google Maps créé");
 
       try {
         console.log("Chargement de Google Maps API...");
