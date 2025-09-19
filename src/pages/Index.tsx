@@ -63,23 +63,13 @@ const Index = () => {
     requestLocation();
   }, [toast]);
 
-  // Load traces at current location
-  const loadTracesAtLocation = async () => {
-    if (!location) return;
-
+  // Load all traces globally (not just nearby)
+  const loadAllTraces = async () => {
     setIsLoading(true);
     try {
-      // Query traces within ~50 meters of current location
-      const latRange = 0.0005; // approximately 50 meters
-      const lngRange = 0.0005;
-
       const { data, error } = await supabase
         .from("traces")
         .select("*")
-        .gte("latitude", location.lat - latRange)
-        .lte("latitude", location.lat + latRange)
-        .gte("longitude", location.lng - lngRange)
-        .lte("longitude", location.lng + lngRange)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -92,10 +82,9 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (location) {
-      loadTracesAtLocation();
-    }
-  }, [location]);
+    // Load all traces when component mounts
+    loadAllTraces();
+  }, []);
 
   // Submit a new trace
   const submitTrace = async () => {
@@ -117,7 +106,7 @@ const Index = () => {
 
       setMessage("");
       setIsWriting(false);
-      loadTracesAtLocation(); // Reload traces
+      loadAllTraces(); // Reload all traces
     } catch (error) {
       toast({
         title: "Erreur",
