@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import traceIcon from '@/assets/trace-icon.svg';
 
 interface MapboxGlobeProps {
   center: { lat: number; lng: number };
@@ -108,12 +109,18 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers (same golden but slightly smaller)
+    // Add trace markers (custom icon)
     traces.forEach(trace => {
-      const marker = new mapboxgl.Marker({
-        color: '#fbbf24',
-        scale: 0.6
-      })
+      // Create custom element for the trace icon
+      const el = document.createElement('div');
+      el.style.backgroundImage = `url(${traceIcon})`;
+      el.style.backgroundSize = 'contain';
+      el.style.backgroundRepeat = 'no-repeat';
+      el.style.width = '20px';
+      el.style.height = '20px';
+      el.style.filter = 'brightness(0) saturate(100%) invert(67%) sepia(79%) saturate(1739%) hue-rotate(8deg) brightness(102%) contrast(92%)'; // Apply golden color
+      
+      const marker = new mapboxgl.Marker(el)
         .setLngLat([trace.longitude, trace.latitude])
         .setPopup(new mapboxgl.Popup().setText(trace.message))
         .addTo(map.current!);
