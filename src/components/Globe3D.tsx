@@ -66,26 +66,26 @@ const EarthSphere = ({ onGlobeClick, traces = [], center }: { onGlobeClick?: Glo
         />
       </mesh>
 
-      {/* Current position marker */}
-      <mesh position={latLngToVector3(center.lat, center.lng, 1.05)}>
-        <sphereGeometry args={[0.03, 8, 8]} />
+      {/* Current position marker - plus gros et plus visible */}
+      <mesh position={latLngToVector3(center.lat, center.lng, 1.08)}>
+        <sphereGeometry args={[0.05, 8, 8]} />
         <meshStandardMaterial 
           color="#ef4444" 
           emissive="#ef4444" 
-          emissiveIntensity={0.8} 
+          emissiveIntensity={1.2} 
         />
       </mesh>
 
-      {/* Traces markers */}
+      {/* Traces markers - plus gros et plus visibles */}
       {traces.map((trace) => {
-        const position = latLngToVector3(trace.latitude, trace.longitude, 1.05);
+        const position = latLngToVector3(trace.latitude, trace.longitude, 1.08);
         return (
           <mesh key={trace.id} position={position}>
-            <sphereGeometry args={[0.02, 8, 8]} />
+            <sphereGeometry args={[0.04, 8, 8]} />
             <meshStandardMaterial 
               color="#fbbf24" 
               emissive="#fbbf24" 
-              emissiveIntensity={0.5} 
+              emissiveIntensity={1.0} 
             />
           </mesh>
         );
