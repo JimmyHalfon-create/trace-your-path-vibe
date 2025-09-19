@@ -168,10 +168,6 @@ const Index = () => {
         <Card className="p-3 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-primary">TRACE</h1>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Globe className="w-4 h-4 mr-1" />
-              Mappemonde
-            </div>
           </div>
         </Card>
       </div>
