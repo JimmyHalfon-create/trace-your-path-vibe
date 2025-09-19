@@ -99,20 +99,20 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add current position marker (red)
+    // Add current position marker (small golden)
     const currentMarker = new mapboxgl.Marker({
-      color: '#ef4444',
-      scale: 1.2
+      color: '#fbbf24',
+      scale: 0.7
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers (golden)
+    // Add trace markers (same golden but slightly smaller)
     traces.forEach(trace => {
       const marker = new mapboxgl.Marker({
         color: '#fbbf24',
-        scale: 0.8
+        scale: 0.6
       })
         .setLngLat([trace.longitude, trace.latitude])
         .setPopup(new mapboxgl.Popup().setText(trace.message))
