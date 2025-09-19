@@ -1,9 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 
 interface MapboxGlobeProps {
   center: { lat: number; lng: number };
@@ -31,7 +28,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-v9',
+      style: 'mapbox://styles/mapbox/dark-v11',
       projection: 'globe' as any,
       zoom: 1.5,
       center: [center.lng, center.lat],
@@ -43,17 +40,28 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     map.current.doubleClickZoom.enable();
     map.current.dragRotate.enable();
     map.current.keyboard.disable();
-    map.current.scrollZoom.enable(); // Permet le zoom avec la molette
-    map.current.touchZoomRotate.enable(); // Permet le zoom tactile
+    map.current.scrollZoom.enable();
+    map.current.touchZoomRotate.enable();
 
-    // Add atmosphere and fog effects
+    // Style customization for outline look
     map.current.on('style.load', () => {
+      // Try to customize borders with app colors (golden)
+      try {
+        map.current?.setPaintProperty('country-boundaries', 'line-color', '#fbbf24');
+        map.current?.setPaintProperty('country-boundaries', 'line-width', 1.5);
+        map.current?.setPaintProperty('country-boundaries', 'line-opacity', 0.8);
+      } catch (e) {
+        // Fallback if layer doesn't exist
+        console.log('Style customization not available');
+      }
+      
+      // Add fog effects
       map.current?.setFog({
-        color: 'rgb(20, 20, 30)',
-        'high-color': 'rgb(5, 5, 15)',
-        'horizon-blend': 0.1,
-        'space-color': 'rgb(0, 0, 0)',
-        'star-intensity': 0.8,
+        color: '#0a0a0a',
+        'high-color': '#1a1a1a',
+        'horizon-blend': 0.05,
+        'space-color': '#000000',
+        'star-intensity': 1.0,
       });
     });
 
@@ -113,7 +121,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add current position marker
+    // Add current position marker (red)
     const currentMarker = new mapboxgl.Marker({
       color: '#ef4444',
       scale: 1.2
@@ -122,7 +130,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers
+    // Add trace markers (golden)
     traces.forEach(trace => {
       const marker = new mapboxgl.Marker({
         color: '#fbbf24',
