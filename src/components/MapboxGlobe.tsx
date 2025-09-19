@@ -100,46 +100,64 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
-    // Add current position marker (small golden)
+    // Add current position marker (persistent at all zoom levels)
+    const currentEl = document.createElement('div');
+    currentEl.style.width = '16px';
+    currentEl.style.height = '16px';
+    currentEl.style.borderRadius = '50%';
+    currentEl.style.backgroundColor = '#fbbf24';
+    currentEl.style.border = '2px solid #000';
+    currentEl.style.boxShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
+    currentEl.style.zIndex = '9999';
+    currentEl.style.pointerEvents = 'none';
+    
     const currentMarker = new mapboxgl.Marker({
-      color: '#fbbf24',
-      scale: 0.7
+      element: currentEl,
+      anchor: 'center',
+      pitchAlignment: 'map',
+      rotationAlignment: 'map'
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers (custom icon, fixed visibility)
+    // Add trace markers (persistent at all zoom levels)
     traces.forEach(trace => {
-      // Create custom element for the trace icon
       const el = document.createElement('div');
-      el.style.width = '24px';
-      el.style.height = '24px';
+      el.style.width = '20px';
+      el.style.height = '20px';
       el.style.borderRadius = '50%';
       el.style.backgroundColor = '#fbbf24';
       el.style.border = '2px solid #000';
       el.style.cursor = 'pointer';
-      el.style.zIndex = '1000';
+      el.style.zIndex = '9998';
       el.style.position = 'relative';
+      el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
       
       // Add cross symbol
       const cross = document.createElement('div');
       cross.innerHTML = '⊕';
       cross.style.color = '#000';
-      cross.style.fontSize = '16px';
+      cross.style.fontSize = '14px';
       cross.style.fontWeight = 'bold';
       cross.style.position = 'absolute';
       cross.style.top = '50%';
       cross.style.left = '50%';
       cross.style.transform = 'translate(-50%, -50%)';
+      cross.style.pointerEvents = 'none';
       el.appendChild(cross);
       
       const marker = new mapboxgl.Marker({
         element: el,
-        anchor: 'center'
+        anchor: 'center',
+        pitchAlignment: 'map',
+        rotationAlignment: 'map'
       })
         .setLngLat([trace.longitude, trace.latitude])
-        .setPopup(new mapboxgl.Popup().setText(trace.message))
+        .setPopup(new mapboxgl.Popup({ 
+          closeButton: false,
+          closeOnClick: true 
+        }).setText(trace.message))
         .addTo(map.current!);
       markers.current.push(marker);
     });
