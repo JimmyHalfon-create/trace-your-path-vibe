@@ -41,33 +41,13 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           console.log("Création de l'instance de carte...");
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
-            zoom: Math.min(zoom, 3), // Zoom bas pour vue planisphère
-            mapTypeId: google.maps.MapTypeId.TERRAIN, // Mode planisphère
+            zoom: 2, // Zoom planisphère pour voir continents
+            mapTypeId: google.maps.MapTypeId.SATELLITE,
             tilt: 0,
             styles: [
               {
                 featureType: "all",
                 elementType: "labels",
-                stylers: [{ visibility: "off" }] // Supprimer tous les labels
-              },
-              {
-                featureType: "administrative",
-                elementType: "labels",
-                stylers: [{ visibility: "off" }]
-              },
-              {
-                featureType: "poi",
-                elementType: "labels",
-                stylers: [{ visibility: "off" }]
-              },
-              {
-                featureType: "road",
-                elementType: "all",
-                stylers: [{ visibility: "off" }] // Supprimer les routes
-              },
-              {
-                featureType: "transit",
-                elementType: "all",
                 stylers: [{ visibility: "off" }]
               }
             ],
