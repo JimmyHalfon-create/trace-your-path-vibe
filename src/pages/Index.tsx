@@ -164,7 +164,7 @@ const Index = () => {
       </div>
 
       {/* Floating Header */}
-      <div className="absolute top-4 left-4 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 1rem)` }}>
+      <div className="absolute top-8 left-4 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 3rem)` }}>
         <Card className="p-3 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-primary">TRACE</h1>
@@ -224,7 +224,7 @@ const Index = () => {
         </div>
 
       {/* Traces Count Indicator */}
-      <div className="absolute top-20 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 5rem)` }}>
+      <div className="absolute top-28 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 7rem)` }}>
         <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <div className="flex items-center gap-2 text-sm">
             <MessageSquare className="w-4 h-4 text-primary" />
