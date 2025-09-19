@@ -22,7 +22,7 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
-        apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // L'utilisateur devra fournir sa clé
+        apiKey: "AIzaSyA1I3Y6cWJgIv0ln6Qe5R_ifHSH4oGEaTE",
         version: "weekly",
         libraries: ["places"]
       });
