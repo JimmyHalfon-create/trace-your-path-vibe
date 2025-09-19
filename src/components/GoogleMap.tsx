@@ -41,9 +41,10 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           console.log("Création de l'instance de carte...");
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
-            zoom: 2, // Zoom planisphère pour voir continents
+            zoom: 1, // Zoom très bas pour voir la Terre entière
             mapTypeId: google.maps.MapTypeId.SATELLITE,
             tilt: 0,
+            heading: 0,
             styles: [
               {
                 featureType: "all",
@@ -56,7 +57,7 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
             streetViewControl: false,
             fullscreenControl: false,
             zoomControl: false,
-            rotateControl: false,
+            rotateControl: true, // Permet la rotation
             scaleControl: false,
             panControl: false,
             gestureHandling: 'greedy',
