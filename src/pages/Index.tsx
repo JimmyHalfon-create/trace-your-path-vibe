@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { MapPin, Plus, MessageSquare, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import Globe3D from "@/components/Globe3D";
+import MapboxGlobe from "@/components/MapboxGlobe";
 
 interface Trace {
   id: string;
@@ -153,7 +153,7 @@ const Index = () => {
     <div className="min-h-screen bg-black relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Full Screen Globe */}
       <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
-        <Globe3D
+        <MapboxGlobe
           center={location}
           traces={traces}
           onGlobeClick={(newLocation) => {

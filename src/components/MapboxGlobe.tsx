@@ -1,0 +1,183 @@
+import React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+
+interface MapboxGlobeProps {
+  center: { lat: number; lng: number };
+  onGlobeClick?: (location: { lat: number; lng: number }) => void;
+  traces?: Array<{
+    id: string;
+    latitude: number;
+    longitude: number;
+    message: string;
+    created_at: string;
+  }>;
+}
+
+const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [apiKey, setApiKey] = useState('');
+  const [isKeySet, setIsKeySet] = useState(false);
+  const markers = useRef<mapboxgl.Marker[]>([]);
+
+  useEffect(() => {
+    if (!mapContainer.current || !isKeySet) return;
+
+    // Initialize map
+    mapboxgl.accessToken = apiKey;
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/satellite-v9',
+      projection: 'globe' as any,
+      zoom: 1.5,
+      center: [center.lng, center.lat],
+      pitch: 0,
+    });
+
+    // Disable all controls for clean interface
+    map.current.boxZoom.disable();
+    map.current.doubleClickZoom.disable();
+    map.current.dragRotate.disable();
+    map.current.keyboard.disable();
+    map.current.scrollZoom.disable();
+    map.current.touchZoomRotate.disable();
+
+    // Add atmosphere and fog effects
+    map.current.on('style.load', () => {
+      map.current?.setFog({
+        color: 'rgb(20, 20, 30)',
+        'high-color': 'rgb(5, 5, 15)',
+        'horizon-blend': 0.1,
+        'space-color': 'rgb(0, 0, 0)',
+        'star-intensity': 0.8,
+      });
+    });
+
+    // Rotation animation
+    const secondsPerRevolution = 120;
+    let userInteracting = false;
+
+    function spinGlobe() {
+      if (!map.current || userInteracting) return;
+      
+      const distancePerSecond = 360 / secondsPerRevolution;
+      const center = map.current.getCenter();
+      center.lng -= distancePerSecond;
+      map.current.easeTo({ center, duration: 1000, easing: (n) => n });
+    }
+
+    // Click handler
+    map.current.on('click', (e) => {
+      if (onGlobeClick) {
+        onGlobeClick({
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+        });
+      }
+    });
+
+    // Interaction handlers
+    map.current.on('mousedown', () => { userInteracting = true; });
+    map.current.on('mouseup', () => { 
+      userInteracting = false; 
+      setTimeout(spinGlobe, 1000);
+    });
+    map.current.on('touchend', () => { 
+      userInteracting = false; 
+      setTimeout(spinGlobe, 1000);
+    });
+    map.current.on('moveend', () => {
+      if (!userInteracting) spinGlobe();
+    });
+
+    // Start spinning
+    spinGlobe();
+
+    // Cleanup
+    return () => {
+      markers.current.forEach(marker => marker.remove());
+      markers.current = [];
+      map.current?.remove();
+    };
+  }, [isKeySet, apiKey, center.lat, center.lng, onGlobeClick]);
+
+  // Update markers when traces change
+  useEffect(() => {
+    if (!map.current || !isKeySet) return;
+
+    // Clear existing markers
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
+
+    // Add current position marker
+    const currentMarker = new mapboxgl.Marker({
+      color: '#ef4444',
+      scale: 1.2
+    })
+      .setLngLat([center.lng, center.lat])
+      .addTo(map.current);
+    markers.current.push(currentMarker);
+
+    // Add trace markers
+    traces.forEach(trace => {
+      const marker = new mapboxgl.Marker({
+        color: '#fbbf24',
+        scale: 0.8
+      })
+        .setLngLat([trace.longitude, trace.latitude])
+        .setPopup(new mapboxgl.Popup().setText(trace.message))
+        .addTo(map.current!);
+      markers.current.push(marker);
+    });
+  }, [traces, center, isKeySet]);
+
+  if (!isKeySet) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Card className="p-6 max-w-md mx-auto bg-background/90 backdrop-blur-sm">
+          <h3 className="text-lg font-semibold mb-4">Mapbox Token Required</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Pour afficher le globe avec les vraies cartes, veuillez entrer votre token public Mapbox.
+            Obtenez-le sur{' '}
+            <a 
+              href="https://mapbox.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              mapbox.com
+            </a>
+          </p>
+          <div className="space-y-3">
+            <Input
+              type="text"
+              placeholder="pk.eyJ1Ijoi..."
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+            <Button 
+              onClick={() => setIsKeySet(true)}
+              disabled={!apiKey.startsWith('pk.')}
+              className="w-full"
+            >
+              Charger le Globe
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full">
+      <div ref={mapContainer} className="absolute inset-0" />
+    </div>
+  );
+};
+
+export default MapboxGlobe;
