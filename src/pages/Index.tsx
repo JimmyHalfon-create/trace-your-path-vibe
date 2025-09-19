@@ -172,7 +172,7 @@ const Index = () => {
       </div>
 
         {/* Floating Action Button */}
-        <div className="absolute bottom-6 left-6 right-6 z-10">
+        <div className="absolute bottom-16 left-6 right-6 z-10">
           {!isWriting ? (
             <Button
               onClick={() => setIsWriting(true)}
