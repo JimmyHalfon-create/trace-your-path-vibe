@@ -109,18 +109,35 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers (custom icon)
+    // Add trace markers (custom icon, fixed visibility)
     traces.forEach(trace => {
       // Create custom element for the trace icon
       const el = document.createElement('div');
-      el.style.backgroundImage = `url(${traceIcon})`;
-      el.style.backgroundSize = 'contain';
-      el.style.backgroundRepeat = 'no-repeat';
-      el.style.width = '20px';
-      el.style.height = '20px';
-      el.style.filter = 'brightness(0) saturate(100%) invert(67%) sepia(79%) saturate(1739%) hue-rotate(8deg) brightness(102%) contrast(92%)'; // Apply golden color
+      el.style.width = '24px';
+      el.style.height = '24px';
+      el.style.borderRadius = '50%';
+      el.style.backgroundColor = '#fbbf24';
+      el.style.border = '2px solid #000';
+      el.style.cursor = 'pointer';
+      el.style.zIndex = '1000';
+      el.style.position = 'relative';
       
-      const marker = new mapboxgl.Marker(el)
+      // Add cross symbol
+      const cross = document.createElement('div');
+      cross.innerHTML = '⊕';
+      cross.style.color = '#000';
+      cross.style.fontSize = '16px';
+      cross.style.fontWeight = 'bold';
+      cross.style.position = 'absolute';
+      cross.style.top = '50%';
+      cross.style.left = '50%';
+      cross.style.transform = 'translate(-50%, -50%)';
+      el.appendChild(cross);
+      
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'center'
+      })
         .setLngLat([trace.longitude, trace.latitude])
         .setPopup(new mapboxgl.Popup().setText(trace.message))
         .addTo(map.current!);
