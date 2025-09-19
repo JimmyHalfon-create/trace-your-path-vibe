@@ -52,9 +52,16 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
                 ]
               }
             ],
-            mapTypeControl: true,
+            // Supprimer tous les contrôles pour interface épurée
+            mapTypeControl: false,
             streetViewControl: false,
-            fullscreenControl: true,
+            fullscreenControl: false,
+            zoomControl: false,
+            rotateControl: false,
+            scaleControl: false,
+            panControl: false,
+            gestureHandling: 'greedy',
+            disableDefaultUI: true,
           });
 
           setMap(mapInstance);
