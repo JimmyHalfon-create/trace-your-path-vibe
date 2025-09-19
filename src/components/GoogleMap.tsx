@@ -42,14 +42,25 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
             zoom,
-            mapTypeId: google.maps.MapTypeId.SATELLITE, // Style Earth-like
-            tilt: 45, // Vue 3D comme Google Earth
+            mapTypeId: google.maps.MapTypeId.HYBRID, // Vue planisphère style Earth
+            tilt: 0, // Vue planisphère plate
             styles: [
               {
-                stylers: [
-                  { saturation: -20 },
-                  { lightness: -10 }
-                ]
+                elementType: "geometry",
+                stylers: [{ color: "#1d2c4d" }]
+              },
+              {
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#8ec3b9" }]
+              },
+              {
+                elementType: "labels.text.stroke",
+                stylers: [{ color: "#1a3646" }]
+              },
+              {
+                featureType: "water",
+                elementType: "geometry",
+                stylers: [{ color: "#0e1626" }]
               }
             ],
             // Supprimer tous les contrôles pour interface épurée
