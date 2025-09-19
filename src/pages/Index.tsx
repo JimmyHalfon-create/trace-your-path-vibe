@@ -24,7 +24,7 @@ const Index = () => {
   const { toast } = useToast();
 
   // Get user's current location
-  useEffect(() => {
+  const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -34,14 +34,33 @@ const Index = () => {
           });
         },
         (error) => {
+          console.error("Geolocation error:", error);
+          // Use a default location (Paris) if geolocation fails
+          setLocation({
+            lat: 48.8566,
+            lng: 2.3522,
+          });
           toast({
-            title: "Localisation requise",
-            description: "TRACE a besoin de votre position pour fonctionner.",
-            variant: "destructive",
+            title: "Géolocalisation non disponible",
+            description: "Position par défaut utilisée (Paris). Cliquez sur la carte pour changer de lieu.",
           });
         }
       );
+    } else {
+      // Fallback to default location if geolocation is not supported
+      setLocation({
+        lat: 48.8566,
+        lng: 2.3522,
+      });
+      toast({
+        title: "Géolocalisation non supportée",
+        description: "Position par défaut utilisée (Paris). Cliquez sur la carte pour changer de lieu.",
+      });
     }
+  };
+
+  useEffect(() => {
+    requestLocation();
   }, [toast]);
 
   // Load traces at current location
