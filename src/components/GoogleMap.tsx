@@ -42,25 +42,33 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
             zoom,
-            mapTypeId: google.maps.MapTypeId.HYBRID, // Vue planisphère style Earth
+            mapTypeId: google.maps.MapTypeId.SATELLITE, // Mode satellite pur
             tilt: 0, // Vue planisphère plate
             styles: [
               {
-                elementType: "geometry",
-                stylers: [{ color: "#1d2c4d" }]
+                featureType: "all",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }] // Supprimer tous les labels
               },
               {
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#8ec3b9" }]
+                featureType: "administrative",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
               },
               {
-                elementType: "labels.text.stroke",
-                stylers: [{ color: "#1a3646" }]
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
               },
               {
-                featureType: "water",
-                elementType: "geometry",
-                stylers: [{ color: "#0e1626" }]
+                featureType: "road",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+              },
+              {
+                featureType: "transit",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
               }
             ],
             // Supprimer tous les contrôles pour interface épurée
