@@ -39,13 +39,13 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       pitch: 0,
     });
 
-    // Disable all controls for clean interface
+    // Enable zoom and rotation for interaction
     map.current.boxZoom.disable();
-    map.current.doubleClickZoom.disable();
-    map.current.dragRotate.disable();
+    map.current.doubleClickZoom.enable();
+    map.current.dragRotate.enable();
     map.current.keyboard.disable();
-    map.current.scrollZoom.disable();
-    map.current.touchZoomRotate.disable();
+    map.current.scrollZoom.enable(); // Permet le zoom avec la molette
+    map.current.touchZoomRotate.enable(); // Permet le zoom tactile
 
     // Add atmosphere and fog effects
     map.current.on('style.load', () => {
