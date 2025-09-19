@@ -21,6 +21,8 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
 
   useEffect(() => {
     console.log("GoogleMap useEffect déclenché, center:", center);
+    if (!mapRef.current) return;
+    
     const initMap = async () => {
       console.log("Initialisation de la carte...");
       const loader = new Loader({
@@ -35,7 +37,8 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
         await loader.load();
         console.log("Google Maps API chargé avec succès");
         
-        if (mapRef.current) {
+        if (mapRef.current && !map) {
+          console.log("Création de l'instance de carte...");
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
             zoom,
@@ -55,6 +58,7 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           });
 
           setMap(mapInstance);
+          console.log("Carte créée avec succès");
 
           // Add click listener
           if (onMapClick) {
@@ -88,8 +92,10 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
       }
     };
 
-    initMap();
-  }, [center, zoom, onMapClick]);
+    if (!map) {
+      initMap();
+    }
+  }, [center, zoom, onMapClick, map]);
 
   // Update trace markers when traces change
   useEffect(() => {
