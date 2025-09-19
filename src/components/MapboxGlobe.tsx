@@ -55,13 +55,13 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         console.log('Style customization not available');
       }
       
-      // Add fog effects
+      // Add fog effects (without stars)
       map.current?.setFog({
         color: '#0a0a0a',
         'high-color': '#1a1a1a',
         'horizon-blend': 0.05,
         'space-color': '#000000',
-        'star-intensity': 1.0,
+        'star-intensity': 0,
       });
     });
 
