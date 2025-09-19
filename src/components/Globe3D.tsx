@@ -35,7 +35,7 @@ const vector3ToLatLng = (position: THREE.Vector3) => {
   return { lat, lng };
 };
 
-const EarthSphere = ({ onGlobeClick, traces = [] }: { onGlobeClick?: Globe3DProps['onGlobeClick'], traces: Globe3DProps['traces'] }) => {
+const EarthSphere = ({ onGlobeClick, traces = [], center }: { onGlobeClick?: Globe3DProps['onGlobeClick'], traces: Globe3DProps['traces'], center: { lat: number; lng: number } }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
   // Auto-rotation
@@ -63,6 +63,16 @@ const EarthSphere = ({ onGlobeClick, traces = [] }: { onGlobeClick?: Globe3DProp
           color="#1e40af" 
           roughness={0.8}
           metalness={0.2}
+        />
+      </mesh>
+
+      {/* Current position marker */}
+      <mesh position={latLngToVector3(center.lat, center.lng, 1.05)}>
+        <sphereGeometry args={[0.03, 8, 8]} />
+        <meshStandardMaterial 
+          color="#ef4444" 
+          emissive="#ef4444" 
+          emissiveIntensity={0.8} 
         />
       </mesh>
 
@@ -95,7 +105,7 @@ const Globe3D = ({ center, onGlobeClick, traces = [] }: Globe3DProps) => {
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <pointLight position={[-10, -10, -5]} intensity={0.5} />
         
-        <EarthSphere onGlobeClick={onGlobeClick} traces={traces} />
+        <EarthSphere onGlobeClick={onGlobeClick} traces={traces} center={center} />
         
         <OrbitControls
           enableZoom={true}
