@@ -65,18 +65,8 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       });
     });
 
-    // Rotation animation
-    const secondsPerRevolution = 120;
+    // Rotation animation (disabled - no auto rotation)
     let userInteracting = false;
-
-    function spinGlobe() {
-      if (!map.current || userInteracting) return;
-      
-      const distancePerSecond = 360 / secondsPerRevolution;
-      const center = map.current.getCenter();
-      center.lng -= distancePerSecond;
-      map.current.easeTo({ center, duration: 1000, easing: (n) => n });
-    }
 
     // Click handler
     map.current.on('click', (e) => {
@@ -90,20 +80,8 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
 
     // Interaction handlers
     map.current.on('mousedown', () => { userInteracting = true; });
-    map.current.on('mouseup', () => { 
-      userInteracting = false; 
-      setTimeout(spinGlobe, 1000);
-    });
-    map.current.on('touchend', () => { 
-      userInteracting = false; 
-      setTimeout(spinGlobe, 1000);
-    });
-    map.current.on('moveend', () => {
-      if (!userInteracting) spinGlobe();
-    });
-
-    // Start spinning
-    spinGlobe();
+    map.current.on('mouseup', () => { userInteracting = false; });
+    map.current.on('touchend', () => { userInteracting = false; });
 
     // Cleanup
     return () => {
