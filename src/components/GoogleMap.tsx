@@ -41,9 +41,9 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
           console.log("Création de l'instance de carte...");
           const mapInstance = new google.maps.Map(mapRef.current, {
             center,
-            zoom,
-            mapTypeId: google.maps.MapTypeId.SATELLITE, // Mode satellite pur
-            tilt: 0, // Vue planisphère plate
+            zoom: Math.min(zoom, 3), // Zoom bas pour vue planisphère
+            mapTypeId: google.maps.MapTypeId.TERRAIN, // Mode planisphère
+            tilt: 0,
             styles: [
               {
                 featureType: "all",
@@ -62,12 +62,12 @@ const GoogleMap = ({ center, zoom = 15, onMapClick, traces = [] }: GoogleMapProp
               },
               {
                 featureType: "road",
-                elementType: "labels",
-                stylers: [{ visibility: "off" }]
+                elementType: "all",
+                stylers: [{ visibility: "off" }] // Supprimer les routes
               },
               {
                 featureType: "transit",
-                elementType: "labels",
+                elementType: "all",
                 stylers: [{ visibility: "off" }]
               }
             ],
