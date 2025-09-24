@@ -31,10 +31,19 @@ export function calculateDistance(pos1: Location, pos2: Location): number {
 }
 
 // Vérifie si l'utilisateur est proche d'une trace (dans un rayon de 50 mètres)
+// ou si la trace a été créée récemment (dernière heure)
 export function isNearTrace(userLocation: Location, trace: Trace, radius = 50): boolean {
   const traceLocation = { lat: trace.latitude, lng: trace.longitude };
   const distance = calculateDistance(userLocation, traceLocation);
-  return distance <= radius;
+  
+  // Toujours accessible si créée dans la dernière heure
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const traceCreatedAt = new Date(trace.created_at);
+  const isRecentlyCreated = traceCreatedAt > oneHourAgo;
+  
+  console.log(`Trace ${trace.id}: distance=${Math.round(distance)}m, recent=${isRecentlyCreated}`);
+  
+  return distance <= radius || isRecentlyCreated;
 }
 
 // Trouve les traces à proximité

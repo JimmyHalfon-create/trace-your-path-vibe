@@ -128,9 +128,12 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     markers.current.push(currentMarker);
 
     // Add trace markers with proximity check
+    console.log('Rendering traces:', traces.length);
     traces.forEach(trace => {
       const isAccessible = isTraceAccessible(trace);
       const distance = getDistanceToTrace(trace);
+      
+      console.log(`Trace ${trace.id}: accessible=${isAccessible}, distance=${distance ? Math.round(distance) : 'null'}m`);
       
       const el = document.createElement('div');
       el.style.width = '20px';
@@ -141,10 +144,21 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       el.style.zIndex = '9998';
       el.style.position = 'relative';
       
+      // Vérifier si la trace est récente (dernière heure)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const traceCreatedAt = new Date(trace.created_at);
+      const isRecentlyCreated = traceCreatedAt > oneHourAgo;
+      
       // Style différent selon l'accessibilité
       if (isAccessible) {
-        el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
-        el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+        if (isRecentlyCreated) {
+          el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
+          el.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.8)'; // Halo plus fort pour les nouvelles traces
+          el.style.border = '3px solid #f59e0b'; // Bordure plus épaisse
+        } else {
+          el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
+          el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+        }
       } else {
         el.style.backgroundColor = '#4b5563'; // Gris foncé contrasté si non accessible
         el.style.boxShadow = '0 0 8px rgba(75, 85, 99, 0.4)';
