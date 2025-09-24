@@ -18,6 +18,7 @@ interface MapboxGlobeProps {
   userLocation: { lat: number; lng: number } | null;
   isTraceAccessible: (trace: Trace) => boolean;
   getDistanceToTrace: (trace: Trace) => number | null;
+  customToken?: string;
   traces?: Array<{
     id: string;
     latitude: number;
@@ -29,11 +30,11 @@ interface MapboxGlobeProps {
   }>;
 }
 
-const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace }: MapboxGlobeProps) => {
+const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace, customToken }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21mcW5heHk2MDBnMDJpczk0czdvOXUzNSJ9.Y4ToOLdwjWzuJxIn_v9EBg';
+  const MAPBOX_TOKEN = customToken || 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21mcW5heHk2MDBnMDJpczk0czdvOXUzNSJ9.Y4ToOLdwjWzuJxIn_v9EBg';
 
   useEffect(() => {
     if (!mapContainer.current) return;

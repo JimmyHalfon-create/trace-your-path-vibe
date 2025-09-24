@@ -29,12 +29,15 @@ const Index = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [traces, setTraces] = useState<Trace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [mapboxToken, setMapboxToken] = useState('');
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Système de proximité
   const { nearbyTraces, isTraceAccessible, getDistanceToTrace } = useProximity(location, traces);
 
-  // Get user's current location with high accuracy
+  // Get user's current location with high accuracy for iOS Safari
   const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -43,22 +46,51 @@ const Index = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
+          setMapError(null);
         },
         (error) => {
           console.error("Geolocation error:", error);
+          let errorMessage = "Erreur de géolocalisation";
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Permission refusée. Activez la géolocalisation dans les réglages iOS : Réglages > Confidentialité > Services de localisation";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Position indisponible. Vérifiez votre connexion GPS.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Délai d'attente dépassé. Réessayez.";
+              break;
+          }
+          
+          setMapError(errorMessage);
+          
+          // Position par défaut si erreur (Paris)
+          setLocation({
+            lat: 48.8566,
+            lng: 2.3522,
+          });
+          
           toast({
-            title: "Géolocalisation requise",
-            description: "Veuillez autoriser l'accès à votre position pour laisser une trace.",
+            title: "Géolocalisation",
+            description: errorMessage,
             variant: "destructive",
           });
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 15000, // 15 secondes pour iOS
           maximumAge: 300000 // 5 minutes
         }
       );
     } else {
+      setMapError("Géolocalisation non supportée");
+      // Position par défaut
+      setLocation({
+        lat: 48.8566,
+        lng: 2.3522,
+      });
       toast({
         title: "Géolocalisation non supportée",
         description: "Votre navigateur ne supporte pas la géolocalisation.",
@@ -224,11 +256,73 @@ const Index = () => {
 
   if (!location) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-6 max-w-md">
           <Globe className="w-16 h-16 text-primary mx-auto animate-pulse" />
           <h1 className="text-3xl font-bold text-foreground">TRACE</h1>
-          <p className="text-muted-foreground">Initialisation de la mappemonde...</p>
+          
+          {mapError ? (
+            <div className="space-y-4">
+              <p className="text-destructive text-sm">{mapError}</p>
+              
+              {!showTokenInput ? (
+                <div className="space-y-3">
+                  <Button onClick={requestLocation} className="w-full">
+                    <Navigation className="w-4 h-4 mr-2" />
+                    Réessayer la géolocalisation
+                  </Button>
+                  <p className="text-xs text-muted-foreground">Ou</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowTokenInput(true)}
+                    className="w-full"
+                  >
+                    Configurer token Mapbox personnalisé
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Obtenez votre token sur{' '}
+                    <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                      mapbox.com
+                    </a>
+                  </p>
+                  <input
+                    type="text"
+                    value={mapboxToken}
+                    onChange={(e) => setMapboxToken(e.target.value)}
+                    placeholder="pk.eyJ1..."
+                    className="w-full p-2 border rounded bg-input text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        if (mapboxToken.trim()) {
+                          // Token sera passé au composant MapboxGlobe
+                          setShowTokenInput(false);
+                          requestLocation();
+                        }
+                      }}
+                      disabled={!mapboxToken.trim()}
+                      className="flex-1"
+                    >
+                      Valider
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowTokenInput(false)}
+                      className="flex-1"
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Initialisation de la géolocalisation...</p>
+          )}
         </div>
       </div>
     );
@@ -244,6 +338,7 @@ const Index = () => {
           userLocation={location}
           isTraceAccessible={isTraceAccessible}
           getDistanceToTrace={getDistanceToTrace}
+          customToken={mapboxToken || undefined}
         />
       </div>
 
