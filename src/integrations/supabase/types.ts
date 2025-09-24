@@ -16,25 +16,31 @@ export type Database = {
     Tables: {
       traces: {
         Row: {
+          audio_url: string | null
           created_at: string
           id: string
           latitude: number
           longitude: number
           message: string
+          trace_type: string
         }
         Insert: {
+          audio_url?: string | null
           created_at?: string
           id?: string
           latitude: number
           longitude: number
           message: string
+          trace_type?: string
         }
         Update: {
+          audio_url?: string | null
           created_at?: string
           id?: string
           latitude?: number
           longitude?: number
           message?: string
+          trace_type?: string
         }
         Relationships: []
       }

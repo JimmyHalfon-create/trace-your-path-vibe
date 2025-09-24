@@ -12,6 +12,8 @@ interface MapboxGlobeProps {
     longitude: number;
     message: string;
     created_at: string;
+    trace_type: 'text' | 'voice';
+    audio_url?: string;
   }>;
 }
 
@@ -166,7 +168,15 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         .setPopup(new mapboxgl.Popup({ 
           closeButton: false,
           closeOnClick: true 
-        }).setText(trace.message))
+        }).setHTML(`
+          <div class="text-sm">
+            <p class="font-medium">${trace.message}</p>
+            ${trace.trace_type === 'voice' && trace.audio_url ? 
+              `<audio controls style="width: 100%; margin-top: 8px;"><source src="${trace.audio_url}" type="audio/webm"></audio>` : ''
+            }
+            <p class="text-xs text-gray-500 mt-1">${new Date(trace.created_at).toLocaleDateString('fr-FR')}</p>
+          </div>
+        `))
         .addTo(map.current!);
       markers.current.push(marker);
     });
