@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { MapPin, Plus, MessageSquare, Globe } from "lucide-react";
+import { MapPin, Plus, MessageSquare, Globe, Mic, Square } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MapboxGlobe from "@/components/MapboxGlobe";
@@ -274,6 +274,7 @@ const Index = () => {
                   onClick={() => setTraceType('text')}
                   className="flex-1"
                 >
+                  <MessageSquare className="w-4 h-4 mr-2" />
                   Texte
                 </Button>
                 <Button 
@@ -281,6 +282,7 @@ const Index = () => {
                   onClick={() => setTraceType('voice')}
                   className="flex-1"
                 >
+                  <Mic className="w-4 h-4 mr-2" />
                   Vocal
                 </Button>
               </div>
@@ -299,27 +301,36 @@ const Index = () => {
               ) : (
                 <div className="text-center space-y-4">
                   {!isRecording && !audioBlob && (
-                    <Button onClick={startRecording} variant="outline" className="w-full">
-                      🎤 Commencer l'enregistrement
+                    <Button onClick={startRecording} variant="outline" className="w-full bg-red-50 hover:bg-red-100 border-red-200 text-red-700">
+                      <Mic className="w-4 h-4 mr-2" />
+                      Commencer l'enregistrement
                     </Button>
                   )}
                   
                   {isRecording && (
-                    <div className="space-y-2">
-                      <div className="text-red-500 font-medium">🔴 Enregistrement en cours...</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-center gap-2 text-red-600 font-medium">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        Enregistrement en cours...
+                      </div>
                       <Button onClick={stopRecording} variant="destructive" className="w-full">
+                        <Square className="w-4 h-4 mr-2" />
                         Arrêter l'enregistrement
                       </Button>
                     </div>
                   )}
                   
                   {audioBlob && !isRecording && (
-                    <div className="space-y-2">
-                      <div className="text-green-600 font-medium">✅ Message vocal prêt</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-center gap-2 text-green-600 font-medium">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        Message vocal prêt
+                      </div>
                       <audio 
                         controls 
                         src={URL.createObjectURL(audioBlob)}
                         className="w-full"
+                        style={{ maxHeight: '40px' }}
                       />
                       <Button 
                         onClick={() => {
@@ -329,6 +340,7 @@ const Index = () => {
                         variant="outline" 
                         className="w-full"
                       >
+                        <Mic className="w-4 h-4 mr-2" />
                         Réenregistrer
                       </Button>
                     </div>
