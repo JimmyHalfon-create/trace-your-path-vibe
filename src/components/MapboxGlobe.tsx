@@ -111,9 +111,9 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     currentEl.style.width = '14px';
     currentEl.style.height = '14px';
     currentEl.style.borderRadius = '50%';
-    currentEl.style.backgroundColor = '#3b82f6'; // Bleu au lieu de jaune
+    currentEl.style.backgroundColor = '#9ca3af'; // Gris clair au lieu de bleu
     currentEl.style.border = '3px solid #ffffff'; // Bordure blanche
-    currentEl.style.boxShadow = '0 0 12px rgba(59, 130, 246, 0.8)';
+    currentEl.style.boxShadow = '0 0 12px rgba(156, 163, 175, 0.8)';
     currentEl.style.zIndex = '10000'; // Plus haut que les traces
     currentEl.style.pointerEvents = 'none';
     
@@ -125,7 +125,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     pulse.style.width = '26px';
     pulse.style.height = '26px';
     pulse.style.borderRadius = '50%';
-    pulse.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+    pulse.style.backgroundColor = 'rgba(156, 163, 175, 0.2)';
     pulse.style.animation = 'pulse 2s infinite';
     pulse.style.pointerEvents = 'none';
     currentEl.appendChild(pulse);
