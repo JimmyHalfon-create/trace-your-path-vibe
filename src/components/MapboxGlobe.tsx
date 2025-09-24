@@ -3,8 +3,21 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import traceIcon from '@/assets/trace-icon.svg';
 
+interface Trace {
+  id: string;
+  latitude: number;
+  longitude: number;
+  message: string;
+  created_at: string;
+  trace_type: 'text' | 'voice';
+  audio_url?: string;
+}
+
 interface MapboxGlobeProps {
   center: { lat: number; lng: number };
+  userLocation: { lat: number; lng: number } | null;
+  isTraceAccessible: (trace: Trace) => boolean;
+  getDistanceToTrace: (trace: Trace) => number | null;
   traces?: Array<{
     id: string;
     latitude: number;
@@ -16,7 +29,7 @@ interface MapboxGlobeProps {
   }>;
 }
 
-const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
+const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
@@ -114,24 +127,35 @@ const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
       .addTo(map.current);
     markers.current.push(currentMarker);
 
-    // Add trace markers (persistent at all zoom levels)
+    // Add trace markers with proximity check
     traces.forEach(trace => {
+      const isAccessible = isTraceAccessible(trace);
+      const distance = getDistanceToTrace(trace);
+      
       const el = document.createElement('div');
       el.style.width = '20px';
       el.style.height = '20px';
       el.style.borderRadius = '50%';
-      el.style.backgroundColor = '#fbbf24';
       el.style.border = '2px solid #000';
-      el.style.cursor = 'pointer';
+      el.style.cursor = isAccessible ? 'pointer' : 'not-allowed';
       el.style.zIndex = '9998';
       el.style.position = 'relative';
-      el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+      
+      // Style différent selon l'accessibilité
+      if (isAccessible) {
+        el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
+        el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+      } else {
+        el.style.backgroundColor = '#6b7280'; // Gris si non accessible
+        el.style.boxShadow = '0 0 8px rgba(107, 114, 128, 0.3)';
+        el.style.opacity = '0.6';
+      }
       
       // Add cross symbol
       const cross = document.createElement('div');
-      cross.innerHTML = '⊕';
+      cross.innerHTML = isAccessible ? '⊕' : '🔒';
       cross.style.color = '#000';
-      cross.style.fontSize = '14px';
+      cross.style.fontSize = isAccessible ? '14px' : '12px';
       cross.style.fontWeight = 'bold';
       cross.style.position = 'absolute';
       cross.style.top = '50%';
@@ -140,9 +164,31 @@ const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
       cross.style.pointerEvents = 'none';
       el.appendChild(cross);
       
-      // Add click event to open popup
+      // Add click event - only works if accessible
       el.addEventListener('click', (e) => {
         e.stopPropagation();
+        
+        if (!isAccessible) {
+          // Créer une popup d'information sur la distance
+          const distanceText = distance ? `${Math.round(distance)}m` : 'loin';
+          
+          const infoPopup = new mapboxgl.Popup({ 
+            closeButton: false,
+            closeOnClick: true,
+            maxWidth: '200px'
+          }).setHTML(`
+            <div class="text-sm p-3 text-center" style="font-family: system-ui, -apple-system, sans-serif;">
+              <p style="color: #6b7280; font-weight: 500; margin-bottom: 4px;">🔒 Trace verrouillée</p>
+              <p style="color: #9ca3af; font-size: 11px;">Rapprochez-vous pour la découvrir</p>
+              <p style="color: #fbbf24; font-size: 11px; font-weight: bold;">Distance: ${distanceText}</p>
+            </div>
+          `);
+          
+          marker.setPopup(infoPopup);
+          marker.togglePopup();
+          return;
+        }
+
         // Close any open popups first
         const existingPopups = document.querySelectorAll('.mapboxgl-popup');
         existingPopups.forEach(popup => popup.remove());
@@ -157,8 +203,11 @@ const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
         pitchAlignment: 'viewport',
         rotationAlignment: 'viewport'
       })
-        .setLngLat([trace.longitude, trace.latitude])
-        .setPopup(new mapboxgl.Popup({ 
+        .setLngLat([trace.longitude, trace.latitude]);
+
+      // Add popup only if accessible
+      if (isAccessible) {
+        marker.setPopup(new mapboxgl.Popup({ 
           closeButton: false,
           closeOnClick: true,
           maxWidth: '280px'
@@ -197,11 +246,13 @@ const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
               minute: '2-digit'
             })}</p>
           </div>
-        `))
-        .addTo(map.current!);
+        `));
+      }
+      
+      marker.addTo(map.current!);
       markers.current.push(marker);
     });
-  }, [traces, center]);
+  }, [traces, center, isTraceAccessible, getDistanceToTrace]);
 
   return (
     <div className="w-full h-full">

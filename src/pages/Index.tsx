@@ -7,6 +7,7 @@ import { MapPin, Plus, MessageSquare, Globe, Mic, Square, Navigation } from "luc
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MapboxGlobe from "@/components/MapboxGlobe";
+import { useProximity } from "@/hooks/useProximity";
 
 interface Trace {
   id: string;
@@ -29,6 +30,9 @@ const Index = () => {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Système de proximité
+  const { nearbyTraces, isTraceAccessible, getDistanceToTrace } = useProximity(location, traces);
 
   // Get user's current location with high accuracy
   const requestLocation = () => {
@@ -237,6 +241,9 @@ const Index = () => {
         <MapboxGlobe
           center={location}
           traces={traces}
+          userLocation={location}
+          isTraceAccessible={isTraceAccessible}
+          getDistanceToTrace={getDistanceToTrace}
         />
       </div>
 
@@ -368,6 +375,7 @@ const Index = () => {
 
       {/* Traces Count and Location Update */}
       <div className="absolute top-28 right-4 z-10 space-y-2" style={{ top: `calc(env(safe-area-inset-top) + 7rem)` }}>
+        {/* Compteur de traces */}
         <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <div className="flex items-center gap-2 text-sm">
             <MessageSquare className="w-4 h-4 text-primary" />
@@ -379,6 +387,18 @@ const Index = () => {
           </div>
         </Card>
         
+        {/* Traces à proximité */}
+        {nearbyTraces.length > 0 && (
+          <Card className="p-2 shadow-lg bg-yellow-500/20 backdrop-blur-sm border-yellow-500/50">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
+              <span className="font-medium text-yellow-700">{nearbyTraces.length}</span>
+              <span className="text-yellow-600 text-xs">proche{nearbyTraces.length > 1 ? 's' : ''}</span>
+            </div>
+          </Card>
+        )}
+        
+        {/* Bouton de géolocalisation */}
         <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <Button
             onClick={requestLocation}
