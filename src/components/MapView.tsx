@@ -38,6 +38,13 @@ const MapView = () => {
       await loader.load();
 
       if (navigator.geolocation) {
+        // Options améliorées pour iOS Safari
+        const geoOptions = {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
+        };
+
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const userLocation = {
@@ -93,13 +100,98 @@ const MapView = () => {
           },
           (error) => {
             console.error('Erreur de géolocalisation:', error);
-            toast.error('Impossible d\'accéder à votre position');
-          }
+            let errorMessage = 'Impossible d\'accéder à votre position';
+            
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage = 'Permission de localisation refusée. Veuillez l\'activer dans les réglages.';
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMessage = 'Position indisponible. Vérifiez votre connexion GPS.';
+                break;
+              case error.TIMEOUT:
+                errorMessage = 'Délai d\'attente dépassé. Réessayez.';
+                break;
+            }
+            
+            toast.error(errorMessage);
+            
+            // Position par défaut (Paris) si erreur
+            const defaultLocation = { lat: 48.8566, lng: 2.3522 };
+            setCurrentLocation(defaultLocation);
+            
+            const map = new google.maps.Map(mapRef.current!, {
+              center: defaultLocation,
+              zoom: 12,
+              styles: [
+                {
+                  elementType: 'geometry',
+                  stylers: [{ color: '#1a1a1a' }]
+                },
+                {
+                  elementType: 'labels.text.stroke',
+                  stylers: [{ color: '#1a1a1a' }]
+                },
+                {
+                  elementType: 'labels.text.fill',
+                  stylers: [{ color: '#f5f5f5' }]
+                },
+                {
+                  featureType: 'road',
+                  elementType: 'geometry',
+                  stylers: [{ color: '#2a2a2a' }]
+                }
+              ],
+              disableDefaultUI: true,
+              zoomControl: true
+            });
+            
+            mapInstanceRef.current = map;
+          },
+          geoOptions
         );
+      } else {
+        toast.error('Géolocalisation non supportée par ce navigateur');
+        
+        // Position par défaut (Paris) si géolocalisation non supportée
+        const defaultLocation = { lat: 48.8566, lng: 2.3522 };
+        setCurrentLocation(defaultLocation);
+        
+        const map = new google.maps.Map(mapRef.current!, {
+          center: defaultLocation,
+          zoom: 12,
+          styles: [
+            {
+              elementType: 'geometry',
+              stylers: [{ color: '#1a1a1a' }]
+            },
+            {
+              elementType: 'labels.text.stroke',
+              stylers: [{ color: '#1a1a1a' }]
+            },
+            {
+              elementType: 'labels.text.fill',
+              stylers: [{ color: '#f5f5f5' }]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{ color: '#2a2a2a' }]
+            }
+          ],
+          disableDefaultUI: true,
+          zoomControl: true
+        });
+        
+        mapInstanceRef.current = map;
       }
     } catch (error) {
       console.error('Erreur lors du chargement de Google Maps:', error);
       toast.error('Erreur lors du chargement de la carte');
+      
+      // Position par défaut en cas d'erreur
+      const defaultLocation = { lat: 48.8566, lng: 2.3522 };
+      setCurrentLocation(defaultLocation);
     }
   };
 
