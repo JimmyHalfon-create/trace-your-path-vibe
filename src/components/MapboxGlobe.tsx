@@ -108,20 +108,47 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
 
     // Add current position marker (persistent at all zoom levels)
     const currentEl = document.createElement('div');
-    currentEl.style.width = '16px';
-    currentEl.style.height = '16px';
+    currentEl.style.width = '14px';
+    currentEl.style.height = '14px';
     currentEl.style.borderRadius = '50%';
-    currentEl.style.backgroundColor = '#fbbf24';
-    currentEl.style.border = '2px solid #000';
-    currentEl.style.boxShadow = '0 0 10px rgba(251, 191, 36, 0.6)';
-    currentEl.style.zIndex = '9999';
+    currentEl.style.backgroundColor = '#3b82f6'; // Bleu au lieu de jaune
+    currentEl.style.border = '3px solid #ffffff'; // Bordure blanche
+    currentEl.style.boxShadow = '0 0 12px rgba(59, 130, 246, 0.8)';
+    currentEl.style.zIndex = '10000'; // Plus haut que les traces
     currentEl.style.pointerEvents = 'none';
+    
+    // Add pulse animation
+    const pulse = document.createElement('div');
+    pulse.style.position = 'absolute';
+    pulse.style.top = '-6px';
+    pulse.style.left = '-6px';
+    pulse.style.width = '26px';
+    pulse.style.height = '26px';
+    pulse.style.borderRadius = '50%';
+    pulse.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+    pulse.style.animation = 'pulse 2s infinite';
+    pulse.style.pointerEvents = 'none';
+    currentEl.appendChild(pulse);
+    
+    // Add CSS animation for pulse if not already added
+    if (!document.querySelector('#user-pulse-animation')) {
+      const style = document.createElement('style');
+      style.id = 'user-pulse-animation';
+      style.textContent = `
+        @keyframes pulse {
+          0% { transform: scale(0.8); opacity: 0.8; }
+          50% { transform: scale(1.4); opacity: 0.3; }
+          100% { transform: scale(0.8); opacity: 0.8; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
     
     const currentMarker = new mapboxgl.Marker({
       element: currentEl,
       anchor: 'center',
-      pitchAlignment: 'map',
-      rotationAlignment: 'map'
+      pitchAlignment: 'viewport',
+      rotationAlignment: 'viewport'
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
@@ -136,12 +163,12 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       console.log(`Trace ${trace.id}: accessible=${isAccessible}, distance=${distance ? Math.round(distance) : 'null'}m`);
       
       const el = document.createElement('div');
-      el.style.width = '20px';
-      el.style.height = '20px';
+      el.style.width = '24px'; // Légèrement plus grand que le marqueur utilisateur
+      el.style.height = '24px';
       el.style.borderRadius = '50%';
       el.style.border = '2px solid #000';
       el.style.cursor = isAccessible ? 'pointer' : 'not-allowed';
-      el.style.zIndex = '9998';
+      el.style.zIndex = '9998'; // Juste en dessous du marqueur utilisateur
       el.style.position = 'relative';
       
       // Vérifier si la trace est récente (dernière heure)
