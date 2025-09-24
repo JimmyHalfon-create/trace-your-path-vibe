@@ -167,14 +167,27 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         .setLngLat([trace.longitude, trace.latitude])
         .setPopup(new mapboxgl.Popup({ 
           closeButton: false,
-          closeOnClick: true 
+          closeOnClick: true,
+          maxWidth: '300px'
         }).setHTML(`
-          <div class="text-sm">
-            <p class="font-medium">${trace.message}</p>
+          <div class="text-sm p-2">
+            <p class="font-medium mb-2">${trace.message}</p>
             ${trace.trace_type === 'voice' && trace.audio_url ? 
-              `<audio controls style="width: 100%; margin-top: 8px;"><source src="${trace.audio_url}" type="audio/webm"></audio>` : ''
+              `<div class="mt-2">
+                <audio controls preload="metadata" style="width: 100%; height: 32px;">
+                  <source src="${trace.audio_url}" type="audio/webm">
+                  <source src="${trace.audio_url}" type="audio/wav">
+                  <source src="${trace.audio_url}" type="audio/mp3">
+                  Votre navigateur ne supporte pas l'audio.
+                </audio>
+              </div>` : ''
             }
-            <p class="text-xs text-gray-500 mt-1">${new Date(trace.created_at).toLocaleDateString('fr-FR')}</p>
+            <p class="text-xs text-gray-500 mt-2">${new Date(trace.created_at).toLocaleDateString('fr-FR', {
+              day: 'numeric', 
+              month: 'short', 
+              hour: '2-digit', 
+              minute: '2-digit'
+            })}</p>
           </div>
         `))
         .addTo(map.current!);
