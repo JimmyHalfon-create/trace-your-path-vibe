@@ -170,21 +170,27 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         .setPopup(new mapboxgl.Popup({ 
           closeButton: false,
           closeOnClick: true,
-          maxWidth: '300px'
+          maxWidth: '280px'
         }).setHTML(`
-          <div class="text-sm p-2">
-            <p class="font-medium mb-2">${trace.message}</p>
-            ${trace.trace_type === 'voice' && trace.audio_url ? 
-              `<div class="mt-2">
-                <audio controls preload="metadata" style="width: 100%; height: 32px;">
+          <div class="text-sm p-3" style="font-family: system-ui, -apple-system, sans-serif;">
+            ${trace.trace_type === 'voice' ? 
+              `<div class="flex items-center gap-3 mb-2">
+                <button onclick="this.nextElementSibling.play(); this.style.display='none'; this.nextElementSibling.nextElementSibling.style.display='inline-flex';" 
+                        style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;">
+                  ▶
+                </button>
+                <audio style="display: none;" controls preload="metadata">
                   <source src="${trace.audio_url}" type="audio/webm">
                   <source src="${trace.audio_url}" type="audio/wav">
                   <source src="${trace.audio_url}" type="audio/mp3">
-                  Votre navigateur ne supporte pas l'audio.
                 </audio>
-              </div>` : ''
+                <span style="display: none; color: #10b981; font-size: 12px;">▶ En cours de lecture...</span>
+                <span style="color: #374151; font-weight: 500;">Message vocal</span>
+              </div>` 
+              : 
+              `<p style="color: #111827; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${trace.message}</p>`
             }
-            <p class="text-xs text-gray-500 mt-2">${new Date(trace.created_at).toLocaleDateString('fr-FR', {
+            <p style="color: #6b7280; font-size: 11px; margin: 0;">${new Date(trace.created_at).toLocaleDateString('fr-FR', {
               day: 'numeric', 
               month: 'short', 
               hour: '2-digit', 
