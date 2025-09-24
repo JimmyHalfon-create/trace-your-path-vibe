@@ -146,16 +146,16 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
         el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
         el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
       } else {
-        el.style.backgroundColor = '#6b7280'; // Gris si non accessible
-        el.style.boxShadow = '0 0 8px rgba(107, 114, 128, 0.3)';
-        el.style.opacity = '0.6';
+        el.style.backgroundColor = '#4b5563'; // Gris foncé contrasté si non accessible
+        el.style.boxShadow = '0 0 8px rgba(75, 85, 99, 0.4)';
+        el.style.opacity = '0.8';
       }
       
-      // Add cross symbol
+      // Add cross symbol (toujours le même symbole)
       const cross = document.createElement('div');
-      cross.innerHTML = isAccessible ? '⊕' : '🔒';
+      cross.innerHTML = '⊕';
       cross.style.color = '#000';
-      cross.style.fontSize = isAccessible ? '14px' : '12px';
+      cross.style.fontSize = '14px';
       cross.style.fontWeight = 'bold';
       cross.style.position = 'absolute';
       cross.style.top = '50%';
@@ -178,8 +178,8 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
             maxWidth: '200px'
           }).setHTML(`
             <div class="text-sm p-3 text-center" style="font-family: system-ui, -apple-system, sans-serif;">
-              <p style="color: #6b7280; font-weight: 500; margin-bottom: 4px;">🔒 Trace verrouillée</p>
-              <p style="color: #9ca3af; font-size: 11px;">Rapprochez-vous pour la découvrir</p>
+              <p style="color: #4b5563; font-weight: 500; margin-bottom: 4px;">Trace non accessible</p>
+              <p style="color: #6b7280; font-size: 11px;">Rapprochez-vous pour la découvrir</p>
               <p style="color: #fbbf24; font-size: 11px; font-weight: bold;">Distance: ${distanceText}</p>
             </div>
           `);
