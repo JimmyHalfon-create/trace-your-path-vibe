@@ -149,7 +149,16 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       cross.style.pointerEvents = 'none';
       el.appendChild(cross);
       
-      // Remove click event - let popup handle clicks naturally
+      // Add click event to open popup
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close any open popups first
+        const existingPopups = document.querySelectorAll('.mapboxgl-popup');
+        existingPopups.forEach(popup => popup.remove());
+        
+        // Open this marker's popup
+        marker.togglePopup();
+      });
       
       const marker = new mapboxgl.Marker({
         element: el,
