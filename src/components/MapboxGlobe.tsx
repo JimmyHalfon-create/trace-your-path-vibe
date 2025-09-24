@@ -161,8 +161,8 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
-        pitchAlignment: 'map',
-        rotationAlignment: 'map'
+        pitchAlignment: 'viewport',
+        rotationAlignment: 'viewport'
       })
         .setLngLat([trace.longitude, trace.latitude])
         .setPopup(new mapboxgl.Popup({ 
