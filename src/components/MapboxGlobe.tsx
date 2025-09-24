@@ -174,7 +174,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
         }).setHTML(`
           <div class="text-sm p-3" style="font-family: system-ui, -apple-system, sans-serif;">
             ${trace.trace_type === 'voice' ? 
-              `<div class="flex items-center gap-3 mb-2">
+              `<div class="flex flex-col items-center gap-2 mb-2">
                 <button id="playBtn-${trace.id}" onclick="
                   const audio = this.nextElementSibling;
                   const btn = this;
@@ -187,10 +187,10 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
                     audio.pause();
                     btn.innerHTML = '▶';
                   }
-                " style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold;">
+                " style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold;">
                   ▶
                 </button>
-                <audio preload="metadata">
+                <audio preload="metadata" style="display: none;">
                   <source src="${trace.audio_url}" type="audio/webm">
                   <source src="${trace.audio_url}" type="audio/wav">
                   <source src="${trace.audio_url}" type="audio/mp3">
