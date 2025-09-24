@@ -283,10 +283,7 @@ const Index = () => {
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Obtenez votre token sur{' '}
-                    <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                      mapbox.com
-                    </a>
+                    Obtenez votre token sur mapbox.com (section Tokens)
                   </p>
                   <input
                     type="text"
