@@ -171,25 +171,15 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       el.style.zIndex = '9998'; // Juste en dessous du marqueur utilisateur
       el.style.position = 'relative';
       
-      // Vérifier si la trace est récente (dernière heure)
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const traceCreatedAt = new Date(trace.created_at);
-      const isRecentlyCreated = traceCreatedAt > oneHourAgo;
-      
-      // Style différent selon l'accessibilité
+      // Style différent selon l'accessibilité (strict selon distance)
       if (isAccessible) {
-        if (isRecentlyCreated) {
-          el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
-          el.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.8)'; // Halo plus fort pour les nouvelles traces
-          el.style.border = '3px solid #f59e0b'; // Bordure plus épaisse
-        } else {
-          el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
-          el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
-        }
+        el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
+        el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+        el.style.opacity = '1';
       } else {
-        el.style.backgroundColor = '#4b5563'; // Gris foncé contrasté si non accessible
+        el.style.backgroundColor = '#4b5563'; // Gris foncé si non accessible
         el.style.boxShadow = '0 0 8px rgba(75, 85, 99, 0.4)';
-        el.style.opacity = '0.8';
+        el.style.opacity = '0.6'; // Plus transparent pour bien marquer l'inaccessibilité
       }
       
       // Add cross symbol (toujours le même symbole)
@@ -219,9 +209,9 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
             maxWidth: '200px'
           }).setHTML(`
             <div class="text-sm p-3 text-center" style="font-family: system-ui, -apple-system, sans-serif;">
-              <p style="color: #4b5563; font-weight: 500; margin-bottom: 4px;">Trace non accessible</p>
+              <p style="color: #dc2626; font-weight: 600; margin-bottom: 4px;">🔒 Trace verrouillée</p>
               <p style="color: #6b7280; font-size: 11px;">Rapprochez-vous pour la découvrir</p>
-              <p style="color: #fbbf24; font-size: 11px; font-weight: bold;">Distance: ${distanceText}</p>
+              <p style="color: #ef4444; font-size: 12px; font-weight: bold;">Distance: ${distanceText}</p>
             </div>
           `);
           
