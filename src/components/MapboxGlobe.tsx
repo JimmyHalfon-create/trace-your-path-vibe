@@ -176,7 +176,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
             ${trace.trace_type === 'voice' ? 
               `<div class="flex items-center gap-3 mb-2">
                 <button onclick="this.nextElementSibling.play(); this.style.display='none'; this.nextElementSibling.nextElementSibling.style.display='inline-flex';" 
-                        style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;">
+                        style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold;">
                   ▶
                 </button>
                 <audio style="display: none;" controls preload="metadata">
@@ -184,7 +184,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
                   <source src="${trace.audio_url}" type="audio/wav">
                   <source src="${trace.audio_url}" type="audio/mp3">
                 </audio>
-                <span style="display: none; color: #10b981; font-size: 12px;">▶ En cours de lecture...</span>
+                <span style="display: none; color: #fbbf24; font-size: 12px; font-weight: 500;">▶ En cours de lecture...</span>
                 <span style="color: #374151; font-weight: 500;">Message vocal</span>
               </div>` 
               : 
