@@ -99,8 +99,15 @@ const Index = () => {
     }
   };
 
-  // Update location periodically
+  // Update location periodically et initialize avec position par défaut
   useEffect(() => {
+    // Toujours définir une position par défaut au démarrage
+    setLocation({
+      lat: 48.8566, // Paris par défaut
+      lng: 2.3522,
+    });
+    
+    // Puis essayer d'obtenir la vraie position
     requestLocation();
     const interval = setInterval(requestLocation, 300000); // Update every 5 minutes
     return () => clearInterval(interval);
@@ -254,89 +261,30 @@ const Index = () => {
     });
   };
 
-  if (!location) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center space-y-6 max-w-md">
-          <Globe className="w-16 h-16 text-primary mx-auto animate-pulse" />
-          <h1 className="text-3xl font-bold text-foreground">TRACE</h1>
-          
-          {mapError ? (
-            <div className="space-y-4">
-              <p className="text-destructive text-sm">{mapError}</p>
-              
-              {!showTokenInput ? (
-                <div className="space-y-3">
-                  <Button onClick={requestLocation} className="w-full">
-                    <Navigation className="w-4 h-4 mr-2" />
-                    Réessayer la géolocalisation
-                  </Button>
-                  <p className="text-xs text-muted-foreground">Ou</p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowTokenInput(true)}
-                    className="w-full"
-                  >
-                    Configurer token Mapbox personnalisé
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Obtenez votre token sur mapbox.com (section Tokens)
-                  </p>
-                  <input
-                    type="text"
-                    value={mapboxToken}
-                    onChange={(e) => setMapboxToken(e.target.value)}
-                    placeholder="pk.eyJ1..."
-                    className="w-full p-2 border rounded bg-input text-sm"
-                  />
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={() => {
-                        if (mapboxToken.trim()) {
-                          // Token sera passé au composant MapboxGlobe
-                          setShowTokenInput(false);
-                          requestLocation();
-                        }
-                      }}
-                      disabled={!mapboxToken.trim()}
-                      className="flex-1"
-                    >
-                      Valider
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowTokenInput(false)}
-                      className="flex-1"
-                    >
-                      Annuler
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Initialisation de la géolocalisation...</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
+  // Toujours afficher l'app, même avec position par défaut
   return (
     <div className="min-h-screen bg-black relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Full Screen Globe */}
       <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
-        <MapboxGlobe
-          center={location}
-          traces={traces}
-          userLocation={location}
-          isTraceAccessible={isTraceAccessible}
-          getDistanceToTrace={getDistanceToTrace}
-          customToken={mapboxToken || undefined}
-        />
+        {location ? (
+          <MapboxGlobe
+            center={location}
+            traces={traces}
+            userLocation={location}
+            isTraceAccessible={isTraceAccessible}
+            getDistanceToTrace={getDistanceToTrace}
+            customToken={mapboxToken || undefined}
+          />
+        ) : (
+          // Écran de secours si location pas encore définie
+          <div className="absolute inset-0 bg-black flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <Globe className="w-16 h-16 text-primary mx-auto animate-pulse" />
+              <h1 className="text-3xl font-bold text-primary">TRACE</h1>
+              <p className="text-muted-foreground">Chargement...</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Floating Header */}
