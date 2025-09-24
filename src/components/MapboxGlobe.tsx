@@ -5,7 +5,6 @@ import traceIcon from '@/assets/trace-icon.svg';
 
 interface MapboxGlobeProps {
   center: { lat: number; lng: number };
-  onGlobeClick?: (location: { lat: number; lng: number }) => void;
   traces?: Array<{
     id: string;
     latitude: number;
@@ -17,7 +16,7 @@ interface MapboxGlobeProps {
   }>;
 }
 
-const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) => {
+const MapboxGlobe = ({ center, traces = [] }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
@@ -71,15 +70,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
     // Rotation animation (disabled - no auto rotation)
     let userInteracting = false;
 
-    // Click handler
-    map.current.on('click', (e) => {
-      if (onGlobeClick) {
-        onGlobeClick({
-          lat: e.lngLat.lat,
-          lng: e.lngLat.lng,
-        });
-      }
-    });
+    // Click handler removed - user location is fixed
 
     // Interaction handlers
     map.current.on('mousedown', () => { userInteracting = true; });
@@ -92,7 +83,7 @@ const MapboxGlobe = ({ center, onGlobeClick, traces = [] }: MapboxGlobeProps) =>
       markers.current = [];
       map.current?.remove();
     };
-  }, [center.lat, center.lng, onGlobeClick]);
+  }, [center.lat, center.lng]);
 
   // Update markers when traces change
   useEffect(() => {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { MapPin, Plus, MessageSquare, Globe, Mic, Square } from "lucide-react";
+import { MapPin, Plus, MessageSquare, Globe, Mic, Square, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MapboxGlobe from "@/components/MapboxGlobe";
@@ -30,7 +30,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Get user's current location
+  // Get user's current location with high accuracy
   const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -42,32 +42,32 @@ const Index = () => {
         },
         (error) => {
           console.error("Geolocation error:", error);
-          // Use a default location (Paris) if geolocation fails
-          setLocation({
-            lat: 48.8566,
-            lng: 2.3522,
-          });
           toast({
-            title: "Géolocalisation non disponible",
-            description: "Position par défaut utilisée (Paris). Cliquez sur la carte pour changer de lieu.",
+            title: "Géolocalisation requise",
+            description: "Veuillez autoriser l'accès à votre position pour laisser une trace.",
+            variant: "destructive",
           });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
         }
       );
     } else {
-      // Fallback to default location if geolocation is not supported
-      setLocation({
-        lat: 48.8566,
-        lng: 2.3522,
-      });
       toast({
         title: "Géolocalisation non supportée",
-        description: "Position par défaut utilisée (Paris). Cliquez sur la carte pour changer de lieu.",
+        description: "Votre navigateur ne supporte pas la géolocalisation.",
+        variant: "destructive",
       });
     }
   };
 
+  // Update location periodically
   useEffect(() => {
     requestLocation();
+    const interval = setInterval(requestLocation, 300000); // Update every 5 minutes
+    return () => clearInterval(interval);
   }, [toast]);
 
   // Load all traces globally (not just nearby)
@@ -237,9 +237,6 @@ const Index = () => {
         <MapboxGlobe
           center={location}
           traces={traces}
-          onGlobeClick={(newLocation) => {
-            setLocation(newLocation);
-          }}
         />
       </div>
 
@@ -369,8 +366,8 @@ const Index = () => {
         )}
       </div>
 
-      {/* Traces Count Indicator */}
-      <div className="absolute top-28 right-4 z-10" style={{ top: `calc(env(safe-area-inset-top) + 7rem)` }}>
+      {/* Traces Count and Location Update */}
+      <div className="absolute top-28 right-4 z-10 space-y-2" style={{ top: `calc(env(safe-area-inset-top) + 7rem)` }}>
         <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
           <div className="flex items-center gap-2 text-sm">
             <MessageSquare className="w-4 h-4 text-primary" />
@@ -380,6 +377,17 @@ const Index = () => {
               <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
             )}
           </div>
+        </Card>
+        
+        <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
+          <Button
+            onClick={requestLocation}
+            variant="ghost"
+            size="sm"
+            className="w-full p-1 h-8"
+          >
+            <Navigation className="w-4 h-4" />
+          </Button>
         </Card>
       </div>
     </div>
