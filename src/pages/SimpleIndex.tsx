@@ -8,32 +8,40 @@ const SimpleIndex = () => {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const getLocation = () => {
+    console.log("🔄 Bouton cliqué - Début de getLocation");
     setIsGettingLocation(true);
+    console.log("🔄 isGettingLocation mis à true");
+    
     if (navigator.geolocation) {
+      console.log("✅ Géolocalisation disponible");
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log("✅ Position obtenue:", position.coords);
           setLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
           setIsGettingLocation(false);
+          console.log("✅ State mis à jour");
         },
         (error) => {
-          console.error("Geolocation error:", error);
+          console.error("❌ Erreur géolocalisation:", error);
           // Position par défaut (Paris)
           setLocation({
             lat: 48.8566,
             lng: 2.3522,
           });
           setIsGettingLocation(false);
+          console.log("⚠️ Position par défaut utilisée");
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 300000
+          maximumAge: 0 // Force une nouvelle localisation
         }
       );
     } else {
+      console.log("❌ Géolocalisation non disponible");
       // Position par défaut si pas de géolocalisation
       setLocation({
         lat: 48.8566,
