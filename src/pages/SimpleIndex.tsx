@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Globe, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
+import MapboxGlobe from "@/components/MapboxGlobe";
 
 const SimpleIndex = () => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -67,7 +68,18 @@ const SimpleIndex = () => {
 
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
-        <Globe className="w-24 h-24 text-yellow-400 animate-pulse" />
+        {/* Mappemonde */}
+        {location && (
+          <div className="w-full max-w-md h-64 rounded-lg overflow-hidden">
+            <MapboxGlobe 
+              center={location}
+              userLocation={location}
+              traces={[]}
+              isTraceAccessible={() => false}
+              getDistanceToTrace={() => null}
+            />
+          </div>
+        )}
         
         {!location ? (
           <Card className="p-6 w-full max-w-md bg-gray-900 border-gray-700">
@@ -127,7 +139,7 @@ const SimpleIndex = () => {
 
         <div className="text-center space-y-2">
           <p className="text-xs text-gray-500">
-            Test de l'app native iOS
+            Test de l'app native iOS avec mappemonde
           </p>
           <p className="text-xs text-gray-600">
             Si vous voyez ceci, l'app fonctionne !
