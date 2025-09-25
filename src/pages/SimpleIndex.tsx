@@ -68,10 +68,22 @@ const SimpleIndex = () => {
 
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
-        {/* Icône simple en attendant */}
-        <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mb-4">
-          <MapPin className="w-12 h-12 text-black" />
-        </div>
+        {/* Mappemonde qui s'affiche après géolocalisation */}
+        {location ? (
+          <div className="w-full max-w-md h-64 rounded-lg overflow-hidden mb-4">
+            <MapboxGlobe 
+              center={location}
+              userLocation={location}
+              traces={[]}
+              isTraceAccessible={() => false}
+              getDistanceToTrace={() => null}
+            />
+          </div>
+        ) : (
+          <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mb-4">
+            <MapPin className="w-12 h-12 text-black" />
+          </div>
+        )}
         
         {!location ? (
           <Card className="p-6 w-full max-w-md bg-gray-900 border-gray-700">
