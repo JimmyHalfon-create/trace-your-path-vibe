@@ -16,11 +16,17 @@ const SimpleIndex = () => {
       console.log("✅ Géolocalisation disponible");
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log("✅ Position obtenue:", position.coords);
-          setLocation({
+          console.log("✅ Position obtenue:", {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
           });
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setLocation(newLocation);
+          console.log("✅ Nouvelle position:", newLocation);
           setIsGettingLocation(false);
           console.log("✅ State mis à jour");
         },
