@@ -94,10 +94,18 @@ const SimpleIndex = () => {
               </div>
               <Button 
                 onClick={getLocation}
+                disabled={isGettingLocation}
                 variant="outline"
                 className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
               >
-                Actualiser la position
+                {isGettingLocation ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2" />
+                    Actualisation...
+                  </>
+                ) : (
+                  "Actualiser la position"
+                )}
               </Button>
             </div>
           </Card>
