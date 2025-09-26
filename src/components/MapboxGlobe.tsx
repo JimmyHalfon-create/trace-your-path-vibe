@@ -61,6 +61,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       zoom: 1.5,
       center: [center.lng, center.lat],
       pitch: 0,
+      antialias: true
     });
 
     // Enable zoom and rotation for interaction
@@ -266,8 +267,8 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     currentMarker.current = new mapboxgl.Marker({
       element: currentEl,
       anchor: 'center',
-      pitchAlignment: 'viewport',
-      rotationAlignment: 'viewport'
+      pitchAlignment: 'map',
+      rotationAlignment: 'map'
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
@@ -351,8 +352,8 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
-        pitchAlignment: 'viewport',
-        rotationAlignment: 'viewport'
+        pitchAlignment: 'map',
+        rotationAlignment: 'map'
       })
         .setLngLat([trace.longitude, trace.latitude]);
 
