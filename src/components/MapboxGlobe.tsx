@@ -255,8 +255,8 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     currentMarker.current = new mapboxgl.Marker({
       element: currentEl,
       anchor: 'center',
-      pitchAlignment: 'map',
-      rotationAlignment: 'map'
+      pitchAlignment: 'viewport',
+      rotationAlignment: 'viewport'
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
@@ -340,8 +340,8 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
-        pitchAlignment: 'map',
-        rotationAlignment: 'map'
+        pitchAlignment: 'viewport',
+        rotationAlignment: 'viewport'
       })
         .setLngLat([trace.longitude, trace.latitude]);
 
