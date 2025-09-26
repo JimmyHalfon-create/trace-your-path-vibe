@@ -21,6 +21,7 @@ interface MapboxGlobeProps {
   customToken?: string;
   onLoad?: () => void;
   onError?: () => void;
+  onMapReady?: (map: any) => void;
   traces?: Array<{
     id: string;
     latitude: number;
@@ -32,7 +33,7 @@ interface MapboxGlobeProps {
   }>;
 }
 
-const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace, customToken, onLoad, onError }: MapboxGlobeProps) => {
+const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace, customToken, onLoad, onError, onMapReady }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
@@ -109,13 +110,18 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     map.current.on('mouseup', () => { userInteracting = false; });
     map.current.on('touchend', () => { userInteracting = false; });
 
+    // Pass map reference to parent component
+    if (onMapReady) {
+      onMapReady(map.current);
+    }
+
     // Cleanup
     return () => {
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
       map.current?.remove();
     };
-  }, [center.lat, center.lng]);
+  }, [center.lat, center.lng, onMapReady]);
 
   // Update markers when traces change
   useEffect(() => {

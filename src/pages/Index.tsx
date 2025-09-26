@@ -33,6 +33,7 @@ const Index = () => {
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [mapRef, setMapRef] = useState<any>(null);
 
   // Système de proximité
   const { nearbyTraces, isTraceAccessible, getDistanceToTrace } = useProximity(location, traces);
@@ -42,11 +43,26 @@ const Index = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocation({
+          const newLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          });
+          };
+          setLocation(newLocation);
           setMapError(null);
+          
+          // Recentrer la carte sur la nouvelle position
+          if (mapRef) {
+            mapRef.flyTo({
+              center: [newLocation.lng, newLocation.lat],
+              zoom: 10,
+              duration: 2000
+            });
+          }
+          
+          toast({
+            title: "Position mise à jour",
+            description: "La carte est recentrée sur votre position",
+          });
         },
         (error) => {
           console.error("Geolocation error:", error);
@@ -66,12 +82,6 @@ const Index = () => {
           
           setMapError(errorMessage);
           
-          // Position par défaut si erreur (Paris)
-          setLocation({
-            lat: 48.8566,
-            lng: 2.3522,
-          });
-          
           toast({
             title: "Géolocalisation",
             description: errorMessage,
@@ -86,11 +96,6 @@ const Index = () => {
       );
     } else {
       setMapError("Géolocalisation non supportée");
-      // Position par défaut
-      setLocation({
-        lat: 48.8566,
-        lng: 2.3522,
-      });
       toast({
         title: "Géolocalisation non supportée",
         description: "Votre navigateur ne supporte pas la géolocalisation.",
@@ -325,6 +330,7 @@ const Index = () => {
             isTraceAccessible={isTraceAccessible}
             getDistanceToTrace={getDistanceToTrace}
             customToken={mapboxToken || undefined}
+            onMapReady={setMapRef}
           />
         ) : (
           // Écran de secours si location pas encore définie
