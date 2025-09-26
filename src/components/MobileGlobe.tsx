@@ -25,30 +25,30 @@ const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDista
     setIsLoaded(false);
     setLoadingStatus('Démarrage du chargement...');
     
-    // Add a timeout to detect if the globe fails to load
+    // Give more time for Mapbox to load and don't auto-switch to fallback
     const timeout = setTimeout(() => {
       if (!isLoaded) {
-        console.log('Mapbox timeout - switching to fallback');
-        setLoadingStatus('Timeout - passage en vue simplifiée');
-        setTimeout(() => setHasError(true), 1000);
+        console.log('Mapbox loading taking longer than expected - keeping map visible');
+        setLoadingStatus('Chargement en cours...');
+        // Don't set hasError, just update status
       }
-    }, 10000); // 10 seconds timeout
+    }, 15000); // 15 seconds, but don't switch to fallback
 
     return () => clearTimeout(timeout);
-  }, [center]);
+  }, [center, isLoaded]);
 
   // Debug: Log when callbacks are called
   const handleLoad = () => {
     console.log('Mapbox loaded successfully');
     setIsLoaded(true);
-    setLoadingStatus('Chargé avec succès');
+    setLoadingStatus('Mappemonde chargée !');
     onLoad?.();
   };
 
   const handleError = (error?: any) => {
     console.error('Mapbox error:', error);
-    setLoadingStatus('Erreur de chargement');
-    setTimeout(() => setHasError(true), 1000);
+    setLoadingStatus('Erreur détectée - basculement en vue simplifiée');
+    setTimeout(() => setHasError(true), 2000);
     onError?.();
   };
 
@@ -109,7 +109,7 @@ const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDista
         onLoad={handleLoad}
         onError={handleError}
       />
-      {!isLoaded && (
+      {!isLoaded && !hasError && (
         <div className="absolute inset-0 bg-black flex items-center justify-center">
           <div className="text-center space-y-4">
             <Globe className="w-16 h-16 text-primary mx-auto animate-spin" />
