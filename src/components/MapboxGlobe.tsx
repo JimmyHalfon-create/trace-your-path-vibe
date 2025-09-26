@@ -372,23 +372,19 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
                   const btn = this;
                   if (audio.paused) {
                     audio.play();
-                    btn.innerHTML = '⏸️';
-                    btn.style.fontSize = '14px';
+                    btn.innerHTML = '⏸';
                     audio.onended = () => { 
-                      btn.innerHTML = '▶️'; 
-                      btn.style.fontSize = '16px';
+                      btn.innerHTML = '▶'; 
                     };
                     audio.onpause = () => { 
-                      btn.innerHTML = '▶️';
-                      btn.style.fontSize = '16px';
+                      btn.innerHTML = '▶';
                     };
                   } else {
                     audio.pause();
-                    btn.innerHTML = '▶️';
-                    btn.style.fontSize = '16px';
+                    btn.innerHTML = '▶';
                   }
-                " style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.2s ease;">
-                  ▶️
+                " style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  ▶
                 </button>
                 <audio preload="metadata" style="display: none;">
                   <source src="${trace.audio_url}" type="audio/webm">
