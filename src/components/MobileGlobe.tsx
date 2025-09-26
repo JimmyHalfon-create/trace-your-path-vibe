@@ -10,26 +10,47 @@ interface MobileGlobeProps {
   isTraceAccessible: (trace: any) => boolean;
   getDistanceToTrace: (trace: any) => number | null;
   customToken?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
-const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDistanceToTrace, customToken }: MobileGlobeProps) => {
+const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDistanceToTrace, customToken, onLoad, onError }: MobileGlobeProps) => {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState('Initialisation...');
 
   useEffect(() => {
     // Reset error state when props change
     setHasError(false);
     setIsLoaded(false);
+    setLoadingStatus('Démarrage du chargement...');
     
     // Add a timeout to detect if the globe fails to load
     const timeout = setTimeout(() => {
       if (!isLoaded) {
-        setHasError(true);
+        console.log('Mapbox timeout - switching to fallback');
+        setLoadingStatus('Timeout - passage en vue simplifiée');
+        setTimeout(() => setHasError(true), 1000);
       }
     }, 10000); // 10 seconds timeout
 
     return () => clearTimeout(timeout);
   }, [center]);
+
+  // Debug: Log when callbacks are called
+  const handleLoad = () => {
+    console.log('Mapbox loaded successfully');
+    setIsLoaded(true);
+    setLoadingStatus('Chargé avec succès');
+    onLoad?.();
+  };
+
+  const handleError = (error?: any) => {
+    console.error('Mapbox error:', error);
+    setLoadingStatus('Erreur de chargement');
+    setTimeout(() => setHasError(true), 1000);
+    onError?.();
+  };
 
   if (hasError) {
     return (
@@ -85,15 +106,18 @@ const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDista
         isTraceAccessible={isTraceAccessible}
         getDistanceToTrace={getDistanceToTrace}
         customToken={customToken}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => setHasError(true)}
+        onLoad={handleLoad}
+        onError={handleError}
       />
       {!isLoaded && (
         <div className="absolute inset-0 bg-black flex items-center justify-center">
           <div className="text-center space-y-4">
             <Globe className="w-16 h-16 text-primary mx-auto animate-spin" />
             <h1 className="text-3xl font-bold text-primary">TRACE</h1>
-            <p className="text-muted-foreground">Chargement de la mappemonde...</p>
+            <p className="text-muted-foreground">{loadingStatus}</p>
+            <div className="text-xs text-muted-foreground mt-4 max-w-xs">
+              Token: {customToken ? `${customToken.substring(0, 10)}...` : 'Aucun'}
+            </div>
           </div>
         </div>
       )}
