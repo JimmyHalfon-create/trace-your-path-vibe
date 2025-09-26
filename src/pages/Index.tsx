@@ -30,7 +30,7 @@ const Index = () => {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [mapboxToken, setMapboxToken] = useState('');
-  const [showTokenInput, setShowTokenInput] = useState(true);
+  const [showTokenInput, setShowTokenInput] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const { toast } = useToast();
 

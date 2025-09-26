@@ -36,7 +36,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const MAPBOX_TOKEN = customToken || 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21mcW5heHk2MDBnMDJpczk0czdvOXUzNSJ9.Y4ToOLdwjWzuJxIn_v9EBg';
+  const MAPBOX_TOKEN = customToken || 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21nMHR0eG4zMGhxaTJrczlmOGc2aW1zbSJ9.qsZBAk4Ny_SA5RftJOmIXg';
 
   useEffect(() => {
     if (!mapContainer.current) return;
