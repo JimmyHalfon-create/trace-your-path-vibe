@@ -83,13 +83,20 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       });
       
       // Call onLoad callback when map is ready
-      onLoad?.();
+      if (onLoad) {
+        // Add a small delay to ensure everything is rendered
+        setTimeout(() => {
+          onLoad();
+        }, 1000);
+      }
     });
 
     // Handle map errors
     map.current.on('error', (e) => {
       console.error('Mapbox error:', e);
-      onError?.();
+      if (onError) {
+        onError();
+      }
     });
 
     // Rotation animation (disabled - no auto rotation)
