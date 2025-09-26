@@ -43,6 +43,14 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
   useEffect(() => {
     if (!mapContainer.current) return;
 
+    // Prevent errors from bubbling up that could cause redirects
+    const errorHandler = (e: ErrorEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Mapbox error handled:', e.error);
+    };
+    window.addEventListener('error', errorHandler);
+
     // Initialize map
     mapboxgl.accessToken = MAPBOX_TOKEN;
     
@@ -123,6 +131,9 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
 
     // Cleanup
     return () => {
+      // Remove error handler
+      window.removeEventListener('error', errorHandler);
+      
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
       if (currentMarker.current) {
