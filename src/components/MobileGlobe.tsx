@@ -13,12 +13,12 @@ interface MobileGlobeProps {
 }
 
 const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDistanceToTrace, customToken }: MobileGlobeProps) => {
-  const [hasError, setHasError] = useState(true); // Force fallback temporairement
+  const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // Reset error state when props change
-    setHasError(true); // Force fallback pour debug
+    setHasError(false);
     setIsLoaded(false);
     
     // Add a timeout to detect if the globe fails to load
