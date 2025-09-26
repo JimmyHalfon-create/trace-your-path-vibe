@@ -37,6 +37,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
+  const currentMarker = useRef<mapboxgl.Marker | null>(null);
   const MAPBOX_TOKEN = customToken || 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21nMHR0eG4zMGhxaTJrczlmOGc2aW1zbSJ9.qsZBAk4Ny_SA5RftJOmIXg';
 
   useEffect(() => {
@@ -110,6 +111,11 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     map.current.on('mouseup', () => { userInteracting = false; });
     map.current.on('touchend', () => { userInteracting = false; });
 
+    // Handle zoom changes to resize markers
+    map.current.on('zoom', () => {
+      updateMarkerSizes();
+    });
+
     // Pass map reference to parent component
     if (onMapReady) {
       onMapReady(map.current);
@@ -119,36 +125,113 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     return () => {
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
+      if (currentMarker.current) {
+        currentMarker.current.remove();
+      }
       map.current?.remove();
     };
   }, [center.lat, center.lng, onMapReady]);
+
+  // Function to calculate marker size based on zoom level
+  const getMarkerSize = (baseSize: number, isUserMarker: boolean = false) => {
+    if (!map.current) return baseSize;
+    
+    const zoom = map.current.getZoom();
+    // Zoom scale: 1.5 (globe view) to 15+ (street level)
+    // At zoom 1.5: markers should be smaller (50% of base size)
+    // At zoom 8+: markers should be full size (100% of base size)
+    
+    let scale;
+    if (zoom <= 2) {
+      scale = 0.4; // Très petit au zoom globe
+    } else if (zoom <= 4) {
+      scale = 0.6; // Petit 
+    } else if (zoom <= 6) {
+      scale = 0.8; // Moyen
+    } else {
+      scale = 1.0; // Taille normale
+    }
+    
+    // Le marqueur utilisateur est toujours un peu plus petit
+    if (isUserMarker) {
+      scale *= 0.8;
+    }
+    
+    return Math.max(baseSize * scale, 8); // Minimum 8px
+  };
+
+  // Function to update all marker sizes based on current zoom
+  const updateMarkerSizes = () => {
+    if (!map.current) return;
+
+    // Update user marker size
+    if (currentMarker.current) {
+      const userEl = currentMarker.current.getElement();
+      const newSize = getMarkerSize(14, true);
+      userEl.style.width = `${newSize}px`;
+      userEl.style.height = `${newSize}px`;
+      
+      // Update pulse size too
+      const pulse = userEl.querySelector('div');
+      if (pulse) {
+        const pulseSize = newSize + 12;
+        pulse.style.width = `${pulseSize}px`;
+        pulse.style.height = `${pulseSize}px`;
+        pulse.style.top = `-${(pulseSize - newSize) / 2}px`;
+        pulse.style.left = `-${(pulseSize - newSize) / 2}px`;
+      }
+    }
+
+    // Update trace markers size
+    markers.current.forEach(marker => {
+      const el = marker.getElement();
+      if (el && !el.classList.contains('user-marker')) {
+        const newSize = getMarkerSize(24);
+        el.style.width = `${newSize}px`;
+        el.style.height = `${newSize}px`;
+      }
+    });
+  };
 
   // Update markers when traces change
   useEffect(() => {
     if (!map.current) return;
 
-    // Clear existing markers
-    markers.current.forEach(marker => marker.remove());
-    markers.current = [];
+    // Clear existing markers (except user marker)
+    markers.current.forEach(marker => {
+      if (!marker.getElement().classList.contains('user-marker')) {
+        marker.remove();
+      }
+    });
+    markers.current = markers.current.filter(marker => 
+      marker.getElement().classList.contains('user-marker')
+    );
 
     // Add current position marker (persistent at all zoom levels)
+    if (currentMarker.current) {
+      currentMarker.current.remove();
+    }
+    
+    const userSize = getMarkerSize(14, true);
     const currentEl = document.createElement('div');
-    currentEl.style.width = '14px';
-    currentEl.style.height = '14px';
+    currentEl.className = 'user-marker';
+    currentEl.style.width = `${userSize}px`;
+    currentEl.style.height = `${userSize}px`;
     currentEl.style.borderRadius = '50%';
-    currentEl.style.backgroundColor = '#9ca3af'; // Gris clair au lieu de bleu
+    currentEl.style.backgroundColor = '#9ca3af'; // Gris clair
     currentEl.style.border = '3px solid #ffffff'; // Bordure blanche
     currentEl.style.boxShadow = '0 0 12px rgba(156, 163, 175, 0.8)';
     currentEl.style.zIndex = '10000'; // Plus haut que les traces
     currentEl.style.pointerEvents = 'none';
     
     // Add pulse animation
+    const pulseSize = userSize + 12;
     const pulse = document.createElement('div');
     pulse.style.position = 'absolute';
-    pulse.style.top = '-6px';
-    pulse.style.left = '-6px';
-    pulse.style.width = '26px';
-    pulse.style.height = '26px';
+    pulse.style.top = `-${(pulseSize - userSize) / 2}px`;
+    pulse.style.left = `-${(pulseSize - userSize) / 2}px`;
+    pulse.style.width = `${pulseSize}px`;
+    pulse.style.height = `${pulseSize}px`;
     pulse.style.borderRadius = '50%';
     pulse.style.backgroundColor = 'rgba(156, 163, 175, 0.2)';
     pulse.style.animation = 'pulse 2s infinite';
@@ -169,7 +252,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       document.head.appendChild(style);
     }
     
-    const currentMarker = new mapboxgl.Marker({
+    currentMarker.current = new mapboxgl.Marker({
       element: currentEl,
       anchor: 'center',
       pitchAlignment: 'viewport',
@@ -177,7 +260,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     })
       .setLngLat([center.lng, center.lat])
       .addTo(map.current);
-    markers.current.push(currentMarker);
+    markers.current.push(currentMarker.current);
 
     // Add trace markers with proximity check
     console.log('Rendering traces:', traces.length);
@@ -187,9 +270,10 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       
       console.log(`Trace ${trace.id}: accessible=${isAccessible}, distance=${distance ? Math.round(distance) : 'null'}m`);
       
+      const traceSize = getMarkerSize(24);
       const el = document.createElement('div');
-      el.style.width = '24px'; // Légèrement plus grand que le marqueur utilisateur
-      el.style.height = '24px';
+      el.style.width = `${traceSize}px`;
+      el.style.height = `${traceSize}px`;
       el.style.borderRadius = '50%';
       el.style.border = '2px solid #000';
       el.style.cursor = isAccessible ? 'pointer' : 'not-allowed';
@@ -207,11 +291,11 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
         el.style.opacity = '0.6'; // Plus transparent pour bien marquer l'inaccessibilité
       }
       
-      // Add cross symbol (toujours le même symbole)
+      // Add cross symbol (ajusté selon la taille)
       const cross = document.createElement('div');
       cross.innerHTML = '⊕';
       cross.style.color = '#000';
-      cross.style.fontSize = '14px';
+      cross.style.fontSize = `${Math.max(traceSize * 0.6, 10)}px`; // Ajusté selon la taille du marqueur
       cross.style.fontWeight = 'bold';
       cross.style.position = 'absolute';
       cross.style.top = '50%';
