@@ -13,12 +13,12 @@ interface MobileGlobeProps {
 }
 
 const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDistanceToTrace, customToken }: MobileGlobeProps) => {
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(true); // Force fallback temporairement
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // Reset error state when props change
-    setHasError(false);
+    setHasError(true); // Force fallback pour debug
     setIsLoaded(false);
     
     // Add a timeout to detect if the globe fails to load
@@ -37,16 +37,16 @@ const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDista
         <Card className="p-6 mx-4 text-center space-y-4 bg-background/90 backdrop-blur-sm">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto" />
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">Vue simplifiée</h2>
+            <h2 className="text-xl font-bold text-foreground">TRACE</h2>
             <p className="text-sm text-muted-foreground">
-              La carte 3D n'est pas disponible sur cet appareil
+              Application mobile - Vue simplifiée
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3 w-full max-w-sm">
             <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Position actuelle</span>
+                <span className="text-sm font-medium">Position</span>
               </div>
               <span className="text-xs text-muted-foreground">
                 {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
@@ -55,10 +55,21 @@ const MobileGlobe = ({ center, traces, userLocation, isTraceAccessible, getDista
             <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-secondary-foreground" />
-                <span className="text-sm font-medium">Traces totales</span>
+                <span className="text-sm font-medium">Traces</span>
               </div>
               <span className="text-sm font-semibold">{traces.length}</span>
             </div>
+            {traces.filter(trace => isTraceAccessible(trace)).length > 0 && (
+              <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-green-700">Accessibles</span>
+                </div>
+                <span className="text-sm font-semibold text-green-700">
+                  {traces.filter(trace => isTraceAccessible(trace)).length}
+                </span>
+              </div>
+            )}
           </div>
         </Card>
       </div>
