@@ -506,19 +506,6 @@ const Index = () => {
             <Navigation className="w-4 h-4" />
           </Button>
         </Card>
-        
-        {/* Token Mapbox Button */}
-        <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
-          <Button
-            onClick={() => setShowTokenInput(true)}
-            variant="ghost"
-            size="sm"
-            className="w-full p-1 h-8"
-            title="Configurer token Mapbox"
-          >
-            🗺️
-          </Button>
-        </Card>
       </div>
     </div>
   );
