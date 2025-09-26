@@ -30,7 +30,7 @@ const Index = () => {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [mapboxToken, setMapboxToken] = useState('');
-  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [showTokenInput, setShowTokenInput] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -264,6 +264,57 @@ const Index = () => {
   // Toujours afficher l'app, même avec position par défaut
   return (
     <div className="min-h-screen bg-black relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Mapbox Token Input Modal */}
+      {showTokenInput && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md p-6 space-y-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-xl font-bold text-foreground">Token Mapbox requis</h2>
+              <p className="text-sm text-muted-foreground">
+                Pour afficher la mappemonde 3D, entrez votre token public Mapbox
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Label htmlFor="mapbox-token">Token public Mapbox</Label>
+              <input
+                id="mapbox-token"
+                type="text"
+                placeholder="pk.eyJ1..."
+                value={mapboxToken}
+                onChange={(e) => setMapboxToken(e.target.value)}
+                className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+              />
+              <div className="text-xs text-muted-foreground">
+                Récupérez votre token sur{' '}
+                <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                  mapbox.com
+                </a>{' '}
+                dans la section "Tokens"
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => {
+                  if (mapboxToken.trim()) {
+                    setShowTokenInput(false);
+                  }
+                }}
+                disabled={!mapboxToken.trim()}
+                className="flex-1"
+              >
+                Valider
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setShowTokenInput(false)}
+              >
+                Ignorer
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Full Screen Globe */}
       <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
         {location ? (
@@ -447,6 +498,19 @@ const Index = () => {
             className="w-full p-1 h-8"
           >
             <Navigation className="w-4 h-4" />
+          </Button>
+        </Card>
+        
+        {/* Token Mapbox Button */}
+        <Card className="p-2 shadow-lg bg-background/80 backdrop-blur-sm border-border/50">
+          <Button
+            onClick={() => setShowTokenInput(true)}
+            variant="ghost"
+            size="sm"
+            className="w-full p-1 h-8"
+            title="Configurer token Mapbox"
+          >
+            🗺️
           </Button>
         </Card>
       </div>
