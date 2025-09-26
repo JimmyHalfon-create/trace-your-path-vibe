@@ -19,6 +19,8 @@ interface MapboxGlobeProps {
   isTraceAccessible: (trace: Trace) => boolean;
   getDistanceToTrace: (trace: Trace) => number | null;
   customToken?: string;
+  onLoad?: () => void;
+  onError?: () => void;
   traces?: Array<{
     id: string;
     latitude: number;
@@ -30,7 +32,7 @@ interface MapboxGlobeProps {
   }>;
 }
 
-const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace, customToken }: MapboxGlobeProps) => {
+const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, getDistanceToTrace, customToken, onLoad, onError }: MapboxGlobeProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
@@ -79,6 +81,15 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
         'space-color': '#000000',
         'star-intensity': 0,
       });
+      
+      // Call onLoad callback when map is ready
+      onLoad?.();
+    });
+
+    // Handle map errors
+    map.current.on('error', (e) => {
+      console.error('Mapbox error:', e);
+      onError?.();
     });
 
     // Rotation animation (disabled - no auto rotation)

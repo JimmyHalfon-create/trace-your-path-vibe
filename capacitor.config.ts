@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'app.lovable.808c9e1474e54037b5a045e850c57b1d',
   appName: 'trace-your-path-vibe',
   webDir: 'dist',
-  // Supprimé : server config pour utiliser les fichiers locaux au lieu de l'URL de dev
   plugins: {
     CapacitorHttp: {
       enabled: true,

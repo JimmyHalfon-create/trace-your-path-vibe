@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Plus, MessageSquare, Globe, Mic, Square, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import MapboxGlobe from "@/components/MapboxGlobe";
+import MobileGlobe from "@/components/MobileGlobe";
 import { useProximity } from "@/hooks/useProximity";
 
 interface Trace {
@@ -267,7 +267,7 @@ const Index = () => {
       {/* Full Screen Globe */}
       <div className="absolute inset-0" style={{ top: 'env(safe-area-inset-top)' }}>
         {location ? (
-          <MapboxGlobe
+          <MobileGlobe
             center={location}
             traces={traces}
             userLocation={location}
