@@ -13,6 +13,14 @@ const config: CapacitorConfig = {
       iconColor: "#fbbf24",
       sound: "beep.wav"
     }
+  },
+  ios: {
+    allowsLinkPreview: false,
+    scrollEnabled: false,
+    backgroundColor: '#000000'
+  },
+  server: {
+    androidScheme: 'https'
   }
 };
 
