@@ -6,6 +6,17 @@
     <title>TRACE</title>
     <meta name="description" content="Lovable Generated Project" />
     <meta name="author" content="Lovable" />
+    
+    <!-- Anti target="_blank" script - charge tôt -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(e) {
+          if (e.target.tagName === 'A' && e.target.target === '_blank') {
+            e.target.target = '_self';
+          }
+        }, true);
+      });
+    </script>
 
     <meta property="og:title" content="trace-your-path-vibe" />
     <meta property="og:description" content="Lovable Generated Project" />
