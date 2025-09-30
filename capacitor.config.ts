@@ -13,7 +13,7 @@ const config: CapacitorConfig = {
       iconColor: "#fbbf24",
       sound: "beep.wav"
     }
-  },
+  }
 };
 
 export default config;
