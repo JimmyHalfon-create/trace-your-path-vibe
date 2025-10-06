@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TRACE - Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 30px;
+        }
+        
+        .button {
+            background: #fbbf24;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .info {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">TRACE</h1>
+        <p class="status">✅ App HTML fonctionne !</p>
+        <button class="button" onclick="testLocation()">Test Géolocalisation</button>
+        <div id="result" class="info"></div>
+        <div class="info">
+            <p>Si vous voyez ce texte, l'app iOS se charge correctement</p>
+            <p>Timestamp: <span id="timestamp"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Afficher le timestamp pour prouver que JS fonctionne
+        document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+        
+        function testLocation() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>🔄 Test en cours...</p>';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        result.innerHTML = `
+                            <p>✅ Géolocalisation OK</p>
+                            <p>Lat: ${position.coords.latitude.toFixed(4)}</p>
+                            <p>Lng: ${position.coords.longitude.toFixed(4)}</p>
+                        `;
+                    },
+                    function(error) {
+                        result.innerHTML = `
+                            <p>❌ Erreur géolocalisation</p>
+                            <p>Code: ${error.code}</p>
+                            <p>Message: ${error.message}</p>
+                        `;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                result.innerHTML = '<p>❌ Géolocalisation non supportée</p>';
+            }
+        }
+        
+        // Log pour debug
+        console.log('TRACE App - HTML chargé à:', new Date());
+    </script>
+</body>
+</html>
