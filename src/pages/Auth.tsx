@@ -55,6 +55,9 @@ const Auth = () => {
 
         console.log("User logged in:", data.user?.id);
 
+        // Attendre un peu pour que la session soit bien établie
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         // Vérifier si l'utilisateur est admin
         if (data.user) {
           const { data: roleData, error: roleError } = await supabase
@@ -62,30 +65,29 @@ const Auth = () => {
             .select('role')
             .eq('user_id', data.user.id)
             .eq('role', 'admin')
-            .maybeSingle();
+            .single();
 
-          console.log("Role check result:", { roleData, roleError });
+          console.log("Role check result:", { roleData, roleError, userId: data.user.id });
 
-          if (roleData) {
+          if (roleData && !roleError) {
             // L'utilisateur est admin, rediriger vers le backoffice
             console.log("User is admin, redirecting to /admin");
             toast({
               title: "Connexion réussie",
               description: "Bienvenue admin !",
             });
-            navigate('/admin');
-            return;
-          } else {
-            // Utilisateur normal, rediriger vers la page principale
-            console.log("User is not admin, redirecting to /");
-            toast({
-              title: "Connexion réussie",
-              description: "Bienvenue !",
-            });
-            navigate('/');
+            setTimeout(() => navigate('/admin'), 100);
             return;
           }
         }
+        
+        // Utilisateur normal ou erreur, rediriger vers la page principale
+        console.log("User is not admin, redirecting to /");
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue !",
+        });
+        setTimeout(() => navigate('/'), 100);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
