@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: 'trace-your-path-vibe',
   webDir: 'dist',
   server: {
-    url: 'http://localhost:8080',
-    cleartext: true
+    url: 'https://808c9e14-74e5-4037-b5a0-45e850c57b1d.lovableproject.com',
+    cleartext: true,
+    androidScheme: 'https'
   },
   plugins: {
     CapacitorHttp: {
@@ -22,14 +23,7 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     scrollEnabled: false,
     backgroundColor: '#000000',
-    allowNavigation: [
-      '*',
-      'https://808c9e14-74e5-4037-b5a0-45e850c57b1d.lovableproject.com'
-    ],
-    WKAppBoundDomains: ['lovableproject.com']
-  },
-  server: {
-    androidScheme: 'https'
+    limitsNavigationsToAppBoundDomains: true
   }
 };
 
