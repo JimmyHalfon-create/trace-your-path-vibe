@@ -53,29 +53,37 @@ const Auth = () => {
           throw error;
         }
 
+        console.log("User logged in:", data.user?.id);
+
         // Vérifier si l'utilisateur est admin
         if (data.user) {
-          const { data: roleData } = await supabase
+          const { data: roleData, error: roleError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', data.user.id)
             .eq('role', 'admin')
             .maybeSingle();
 
+          console.log("Role check result:", { roleData, roleError });
+
           if (roleData) {
             // L'utilisateur est admin, rediriger vers le backoffice
+            console.log("User is admin, redirecting to /admin");
             toast({
               title: "Connexion réussie",
               description: "Bienvenue admin !",
             });
             navigate('/admin');
+            return;
           } else {
             // Utilisateur normal, rediriger vers la page principale
+            console.log("User is not admin, redirecting to /");
             toast({
               title: "Connexion réussie",
               description: "Bienvenue !",
             });
             navigate('/');
+            return;
           }
         }
       } else {
