@@ -156,6 +156,17 @@ const Index = () => {
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
+
+      // Auto-stop après 8 secondes
+      setTimeout(() => {
+        if (recorder.state === 'recording') {
+          stopRecording();
+          toast({
+            title: "Enregistrement terminé",
+            description: "Durée maximale de 8 secondes atteinte",
+          });
+        }
+      }, 8000);
     } catch (error) {
       toast({
         title: "Erreur",
@@ -390,13 +401,23 @@ const Index = () => {
               
               {traceType === 'text' ? (
                 <div>
-                  <Label htmlFor="message">Votre message</Label>
+                  <div className="flex justify-between items-center mb-1">
+                    <Label htmlFor="message">Votre message</Label>
+                    <span className={`text-xs ${message.length > 70 ? 'text-red-500 font-semibold' : 'text-muted-foreground'}`}>
+                      {message.length}/70
+                    </span>
+                  </div>
                   <Textarea
                     id="message"
                     placeholder="Laissez votre trace ici..."
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 70) {
+                        setMessage(e.target.value);
+                      }
+                    }}
                     className="mt-1"
+                    maxLength={70}
                   />
                 </div>
               ) : (
@@ -412,7 +433,7 @@ const Index = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-center gap-2 text-red-600 font-medium">
                         <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        Enregistrement en cours...
+                        Enregistrement en cours... (max 8s)
                       </div>
                       <Button onClick={stopRecording} variant="destructive" className="w-full">
                         <Square className="w-4 h-4 mr-2" />
