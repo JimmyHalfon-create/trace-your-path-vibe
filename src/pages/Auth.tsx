@@ -41,7 +41,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -53,11 +53,31 @@ const Auth = () => {
           throw error;
         }
 
-        toast({
-          title: "Connexion réussie",
-          description: "Bienvenue !",
-        });
-        navigate('/');
+        // Vérifier si l'utilisateur est admin
+        if (data.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', data.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+
+          if (roleData) {
+            // L'utilisateur est admin, rediriger vers le backoffice
+            toast({
+              title: "Connexion réussie",
+              description: "Bienvenue admin !",
+            });
+            navigate('/admin');
+          } else {
+            // Utilisateur normal, rediriger vers la page principale
+            toast({
+              title: "Connexion réussie",
+              description: "Bienvenue !",
+            });
+            navigate('/');
+          }
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
