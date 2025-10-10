@@ -302,10 +302,16 @@ const Index = () => {
               />
               <div className="text-xs text-muted-foreground">
                 Récupérez votre token sur{' '}
-                <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                <span 
+                  onClick={() => {
+                    // Copier l'URL dans le presse-papier au lieu d'ouvrir Safari
+                    navigator.clipboard?.writeText('https://mapbox.com/');
+                  }}
+                  className="text-primary underline cursor-pointer"
+                >
                   mapbox.com
-                </a>{' '}
-                dans la section "Tokens"
+                </span>{' '}
+                (URL copiée au clic) dans la section "Tokens"
               </div>
             </div>
             <div className="flex gap-2">
