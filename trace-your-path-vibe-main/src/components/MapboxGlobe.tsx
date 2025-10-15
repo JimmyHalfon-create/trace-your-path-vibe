@@ -155,13 +155,13 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     
     let scale;
     if (zoom <= 2) {
-      scale = 0.4; // Très petit au zoom globe
+      scale = 0.6; // Plus visible au zoom globe
     } else if (zoom <= 4) {
-      scale = 0.6; // Petit 
+      scale = 0.8; // Plus visible
     } else if (zoom <= 6) {
-      scale = 0.8; // Moyen
-    } else {
       scale = 1.0; // Taille normale
+    } else {
+      scale = 1.2; // Encore plus grand en zoom proche
     }
     
     // Le marqueur utilisateur est toujours un peu plus petit
@@ -169,7 +169,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       scale *= 0.8;
     }
     
-    return Math.max(baseSize * scale, 8); // Minimum 8px
+    return Math.max(baseSize * scale, 12); // Minimum 12px (au lieu de 8px)
   };
 
   // Function to update all marker sizes based on current zoom
@@ -282,25 +282,26 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       
       console.log(`Trace ${trace.id}: accessible=${isAccessible}, distance=${distance ? Math.round(distance) : 'null'}m`);
       
-      const traceSize = getMarkerSize(24);
+      const traceSize = getMarkerSize(32); // Taille de base augmentée de 24 à 32
       const el = document.createElement('div');
       el.style.width = `${traceSize}px`;
       el.style.height = `${traceSize}px`;
       el.style.borderRadius = '50%';
-      el.style.border = '2px solid #000';
+      el.style.border = '3px solid #000'; // Bordure plus épaisse
       el.style.cursor = isAccessible ? 'pointer' : 'not-allowed';
-      el.style.zIndex = '9998'; // Juste en dessous du marqueur utilisateur
+      el.style.zIndex = '9998';
       el.style.position = 'relative';
+      el.style.transition = 'all 0.2s ease';
       
-      // Style différent selon l'accessibilité (strict selon distance)
+      // Style différent selon l'accessibilité avec glow plus prononcé
       if (isAccessible) {
-        el.style.backgroundColor = '#fbbf24'; // Jaune si accessible
-        el.style.boxShadow = '0 0 8px rgba(251, 191, 36, 0.5)';
+        el.style.backgroundColor = '#fbbf24'; // Orange/jaune si accessible
+        el.style.boxShadow = '0 0 20px rgba(251, 191, 36, 0.9), 0 0 40px rgba(251, 191, 36, 0.5)'; // Double glow orange
         el.style.opacity = '1';
       } else {
-        el.style.backgroundColor = '#4b5563'; // Gris foncé si non accessible
-        el.style.boxShadow = '0 0 8px rgba(75, 85, 99, 0.4)';
-        el.style.opacity = '0.6'; // Plus transparent pour bien marquer l'inaccessibilité
+        el.style.backgroundColor = '#6b7280'; // Gris si non accessible
+        el.style.boxShadow = '0 0 16px rgba(107, 116, 128, 0.7), 0 0 32px rgba(107, 116, 128, 0.4)'; // Double glow gris
+        el.style.opacity = '0.75';
       }
       
       // Add cross symbol (ajusté selon la taille)
