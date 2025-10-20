@@ -49,18 +49,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
 
   return (
     <div className={`flex items-center gap-3 p-3 bg-secondary/20 rounded-lg ${className}`}>
-      <Button
+      <button
         onClick={togglePlay}
-        size="sm"
-        variant="ghost"
-        className="w-8 h-8 p-0"
+        className="w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity"
+        aria-label={isPlaying ? "Pause" : "Play"}
       >
         {isPlaying ? (
-          <Pause className="w-4 h-4" />
+          <Pause className="w-4 h-4 text-primary-foreground" />
         ) : (
-          <Play className="w-4 h-4" />
+          <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
         )}
-      </Button>
+      </button>
       
       <Volume2 className="w-4 h-4 text-muted-foreground" />
       
