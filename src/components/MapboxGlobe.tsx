@@ -38,6 +38,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const currentMarker = useRef<mapboxgl.Marker | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const MAPBOX_TOKEN = customToken || 'pk.eyJ1IjoiamFtZXNoYWxmb24iLCJhIjoiY21nMHR0eG4zMGhxaTJrczlmOGc2aW1zbSJ9.qsZBAk4Ny_SA5RftJOmIXg';
 
   useEffect(() => {
@@ -134,6 +135,12 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     return () => {
       // Remove error handler
       window.removeEventListener('error', errorHandler);
+      
+      // Stop any playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
       
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
@@ -367,50 +374,109 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
 
       // Add popup only if accessible
       if (isAccessible) {
-        marker.setPopup(new mapboxgl.Popup({ 
-          closeButton: false,
-          closeOnClick: true,
-          maxWidth: '280px'
-        }).setHTML(`
-          <div class="text-sm p-3" style="font-family: system-ui, -apple-system, sans-serif;">
-            ${trace.trace_type === 'voice' ? 
-              `<div class="flex flex-col items-center gap-2 mb-2">
-                <button id="playBtn-${trace.id}" onclick="
-                  const audio = this.nextElementSibling;
-                  const btn = this;
-                  if (audio.paused) {
-                    audio.play();
-                    btn.innerHTML = '⏸';
-                    audio.onended = () => { 
-                      btn.innerHTML = '▶'; 
-                    };
-                    audio.onpause = () => { 
-                      btn.innerHTML = '▶';
-                    };
-                  } else {
-                    audio.pause();
-                    btn.innerHTML = '▶';
-                  }
-                " style="background: #fbbf24; color: #000; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                  ▶
-                </button>
-                <audio preload="metadata" style="display: none;">
-                  <source src="${trace.audio_url}" type="audio/webm">
-                  <source src="${trace.audio_url}" type="audio/wav">
-                  <source src="${trace.audio_url}" type="audio/mp3">
-                </audio>
-              </div>` 
-              : 
-              `<p style="color: #111827; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${trace.message}</p>`
-            }
+        const popupContent = trace.trace_type === 'voice' ? 
+          `<div class="text-sm p-3" style="font-family: system-ui, -apple-system, sans-serif;">
+            <div class="flex flex-col items-center gap-2 mb-2">
+              <button 
+                data-trace-id="${trace.id}"
+                data-audio-url="${trace.audio_url}"
+                class="audio-play-btn"
+                style="background: #F1C40F; color: #000; border: none; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                ▶
+              </button>
+              <p style="color: #9ca3af; font-size: 12px; margin-top: 4px;">Trace audio</p>
+            </div>
             <p style="color: #6b7280; font-size: 11px; margin: 0;">${new Date(trace.created_at).toLocaleDateString('fr-FR', {
               day: 'numeric', 
               month: 'short', 
               hour: '2-digit', 
               minute: '2-digit'
             })}</p>
-          </div>
-        `));
+          </div>` 
+          : 
+          `<div class="text-sm p-3" style="font-family: system-ui, -apple-system, sans-serif;">
+            <p style="color: #111827; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${trace.message}</p>
+            <p style="color: #6b7280; font-size: 11px; margin: 0;">${new Date(trace.created_at).toLocaleDateString('fr-FR', {
+              day: 'numeric', 
+              month: 'short', 
+              hour: '2-digit', 
+              minute: '2-digit'
+            })}</p>
+          </div>`;
+
+        marker.setPopup(new mapboxgl.Popup({ 
+          closeButton: false,
+          closeOnClick: true,
+          maxWidth: '280px'
+        }).setHTML(popupContent));
+
+        // Add listener for audio buttons after popup opens
+        if (trace.trace_type === 'voice') {
+          marker.getPopup()?.on('open', () => {
+            const audioBtn = document.querySelector(`[data-trace-id="${trace.id}"]`) as HTMLButtonElement;
+            if (audioBtn) {
+              audioBtn.onclick = async (e) => {
+                e.stopPropagation();
+                
+                const audioUrl = audioBtn.getAttribute('data-audio-url');
+                if (!audioUrl) return;
+
+                // Arrêter l'audio précédent si en cours
+                if (audioRef.current) {
+                  audioRef.current.pause();
+                  audioRef.current.src = '';
+                }
+
+                // Créer un nouvel élément audio avec configuration mobile
+                const audio = new Audio();
+                audio.preload = 'auto';
+                (audio as any).playsInline = true;
+                (audio as any)['webkit-playsinline'] = true;
+                audio.crossOrigin = 'anonymous';
+                audio.src = audioUrl;
+                
+                console.log('MapboxGlobe: Loading audio for trace', trace.id, audioUrl);
+
+                const updateButton = (playing: boolean) => {
+                  audioBtn.innerHTML = playing ? '⏸' : '▶';
+                };
+
+                audio.addEventListener('ended', () => {
+                  console.log('MapboxGlobe: Audio ended');
+                  updateButton(false);
+                });
+
+                audio.addEventListener('pause', () => {
+                  updateButton(false);
+                });
+
+                audio.addEventListener('error', (e) => {
+                  console.error('MapboxGlobe: Audio error', audio.error);
+                  audioBtn.innerHTML = '❌';
+                });
+
+                audio.addEventListener('canplay', () => {
+                  console.log('MapboxGlobe: Audio can play');
+                });
+
+                try {
+                  if (!audio.paused) {
+                    audio.pause();
+                    updateButton(false);
+                  } else {
+                    await audio.play();
+                    console.log('MapboxGlobe: Audio playing');
+                    updateButton(true);
+                    audioRef.current = audio;
+                  }
+                } catch (err) {
+                  console.error('MapboxGlobe: Play error', err);
+                  audioBtn.innerHTML = '❌';
+                }
+              };
+            }
+          });
+        }
       }
       
       marker.addTo(map.current!);
