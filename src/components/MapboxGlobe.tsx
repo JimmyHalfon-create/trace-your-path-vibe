@@ -149,27 +149,35 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     if (!map.current) return baseSize;
     
     const zoom = map.current.getZoom();
-    // Zoom scale: 1.5 (globe view) to 15+ (street level)
-    // At zoom 1.5: markers should be smaller (50% of base size)
-    // At zoom 8+: markers should be full size (100% of base size)
+    // Zoom progressif: commence très petit et grandit avec le zoom
+    // zoom 0-2: très très petit (3-4px)
+    // zoom 2-4: petit (6-10px)
+    // zoom 4-8: moyen (12-20px)
+    // zoom 8+: taille normale (baseSize)
     
     let scale;
-    if (zoom <= 2) {
-      scale = 0.4; // Très petit au zoom globe
+    if (zoom <= 1) {
+      scale = 0.15; // Minuscule pour vue globale
+    } else if (zoom <= 2) {
+      scale = 0.2; // Très petit
+    } else if (zoom <= 3) {
+      scale = 0.3; // Petit
     } else if (zoom <= 4) {
-      scale = 0.6; // Petit 
+      scale = 0.45; // Petit-moyen
     } else if (zoom <= 6) {
-      scale = 0.8; // Moyen
+      scale = 0.65; // Moyen
+    } else if (zoom <= 8) {
+      scale = 0.85; // Grand
     } else {
-      scale = 1.0; // Taille normale
+      scale = 1.0 + (zoom - 8) * 0.1; // Très grand et continue à grandir
     }
     
     // Le marqueur utilisateur est toujours un peu plus petit
     if (isUserMarker) {
-      scale *= 0.8;
+      scale *= 0.7;
     }
     
-    return Math.max(baseSize * scale, 8); // Minimum 8px
+    return Math.max(baseSize * scale, isUserMarker ? 2 : 3); // Minimum 2-3px
   };
 
   // Function to update all marker sizes based on current zoom
