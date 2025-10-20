@@ -15,21 +15,22 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Précharger l'audio avec compatibilité mobile
+    // Précharger l'audio avec compatibilité mobile maximale
     const audio = new Audio();
+    
+    // Configuration pour compatibilité mobile/WebView
     audio.preload = 'auto';
     (audio as any).playsInline = true;
+    (audio as any)['webkit-playsinline'] = true;
     audio.crossOrigin = 'anonymous';
     
-    // Ajouter timestamp pour éviter le cache
-    const urlWithTimestamp = audioUrl.includes('?') 
-      ? `${audioUrl}&t=${Date.now()}` 
-      : `${audioUrl}?t=${Date.now()}`;
+    console.log('AudioPlayer: Loading audio from:', audioUrl);
     
-    audio.src = urlWithTimestamp;
+    // Utiliser l'URL directement sans timestamp pour éviter les problèmes de cache
+    audio.src = audioUrl;
     
     const handleLoadedMetadata = () => {
-      console.log('Audio loaded, duration:', audio.duration);
+      console.log('AudioPlayer: Loaded metadata, duration:', audio.duration);
       setDuration(audio.duration);
       setIsLoading(false);
       setError(false);
@@ -40,18 +41,24 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
     };
     
     const handleEnded = () => {
+      console.log('AudioPlayer: Playback ended');
       setIsPlaying(false);
       setCurrentTime(0);
     };
     
     const handleError = (e: Event) => {
-      console.error('Audio loading error:', e, audio.error);
+      console.error('AudioPlayer: Loading error', {
+        error: audio.error,
+        code: audio.error?.code,
+        message: audio.error?.message,
+        url: audioUrl
+      });
       setError(true);
       setIsLoading(false);
     };
     
     const handleCanPlay = () => {
-      console.log('Audio can play');
+      console.log('AudioPlayer: Can play audio');
       setIsLoading(false);
     };
     
@@ -81,24 +88,29 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
 
   const togglePlay = async () => {
     if (!audioRef.current || error) {
-      console.error('Cannot play: no audio ref or error state');
+      console.error('AudioPlayer: Cannot play - no audio ref or error state');
       return;
     }
 
     if (isPlaying) {
+      console.log('AudioPlayer: Pausing');
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
       try {
+        console.log('AudioPlayer: Attempting to play');
+        
         // Reset si à la fin
         if (audioRef.current.currentTime >= audioRef.current.duration) {
           audioRef.current.currentTime = 0;
         }
         
+        // Attendre que le play soit prêt
         await audioRef.current.play();
+        console.log('AudioPlayer: Playing successfully');
         setIsPlaying(true);
       } catch (err) {
-        console.error('Playback error:', err);
+        console.error('AudioPlayer: Playback error', err);
         setError(true);
         setIsPlaying(false);
       }
