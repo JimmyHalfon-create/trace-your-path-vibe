@@ -438,7 +438,7 @@ const Index = () => {
       {/* Admin Button - Very discreet */}
       <button
         onClick={() => navigate('/auth')}
-        className="absolute top-8 right-4 z-10 opacity-60 active:opacity-100 transition-opacity duration-300 p-2"
+        className="absolute top-8 right-4 z-10 opacity-30 active:opacity-100 transition-opacity duration-300 p-2"
         style={{ top: `calc(env(safe-area-inset-top) + 3rem)` }}
         aria-label="Admin"
       >
