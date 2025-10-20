@@ -71,8 +71,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
             style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%' }}
           />
         </div>
-        <span className="text-xs min-w-[40px]">
-          {duration > 0 ? formatTime(currentTime) : '0:00'}
+        <span className="text-xs min-w-[80px]">
+          {duration > 0 ? `${formatTime(currentTime)} / ${formatTime(duration)}` : '0:00'}
         </span>
       </div>
     </div>
