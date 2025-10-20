@@ -15,54 +15,93 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) =
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Précharger l'audio
+    // Précharger l'audio avec compatibilité mobile
     const audio = new Audio();
-    audio.preload = 'metadata';
-    audio.src = audioUrl;
+    audio.preload = 'auto';
+    (audio as any).playsInline = true;
+    audio.crossOrigin = 'anonymous';
     
-    audio.addEventListener('loadedmetadata', () => {
+    // Ajouter timestamp pour éviter le cache
+    const urlWithTimestamp = audioUrl.includes('?') 
+      ? `${audioUrl}&t=${Date.now()}` 
+      : `${audioUrl}?t=${Date.now()}`;
+    
+    audio.src = urlWithTimestamp;
+    
+    const handleLoadedMetadata = () => {
+      console.log('Audio loaded, duration:', audio.duration);
       setDuration(audio.duration);
       setIsLoading(false);
       setError(false);
-    });
+    };
     
-    audio.addEventListener('timeupdate', () => {
+    const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
-    });
+    };
     
-    audio.addEventListener('ended', () => {
+    const handleEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-    });
-
-    audio.addEventListener('error', (e) => {
-      console.error('Audio loading error:', e);
+    };
+    
+    const handleError = (e: Event) => {
+      console.error('Audio loading error:', e, audio.error);
       setError(true);
       setIsLoading(false);
-    });
+    };
+    
+    const handleCanPlay = () => {
+      console.log('Audio can play');
+      setIsLoading(false);
+    };
+    
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('canplay', handleCanPlay);
+    
+    // Charger l'audio
+    audio.load();
 
     audioRef.current = audio;
 
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
+        audioRef.current.removeEventListener('ended', handleEnded);
+        audioRef.current.removeEventListener('error', handleError);
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
         audioRef.current.src = '';
       }
     };
   }, [audioUrl]);
 
-  const togglePlay = () => {
-    if (!audioRef.current || error) return;
+  const togglePlay = async () => {
+    if (!audioRef.current || error) {
+      console.error('Cannot play: no audio ref or error state');
+      return;
+    }
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().catch((err) => {
+      try {
+        // Reset si à la fin
+        if (audioRef.current.currentTime >= audioRef.current.duration) {
+          audioRef.current.currentTime = 0;
+        }
+        
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
         console.error('Playback error:', err);
         setError(true);
-      });
-      setIsPlaying(true);
+        setIsPlaying(false);
+      }
     }
   };
 

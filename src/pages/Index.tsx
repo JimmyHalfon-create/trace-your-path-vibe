@@ -166,18 +166,41 @@ const Index = () => {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        } 
+      });
+      
+      // Utiliser le format le plus compatible possible
+      const mimeType = MediaRecorder.isTypeSupported('audio/mp4') 
+        ? 'audio/mp4' 
+        : MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+        
+      const recorder = new MediaRecorder(stream, { 
+        mimeType,
+        audioBitsPerSecond: 128000
+      });
       const chunks: BlobPart[] = [];
 
-      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+      
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const blob = new Blob(chunks, { type: mimeType });
         setAudioBlob(blob);
         setRecordingTime(0);
+        stream.getTracks().forEach(track => track.stop());
       };
 
-      recorder.start();
+      recorder.start(100); // Collecte les données toutes les 100ms
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTime(0);
@@ -205,6 +228,7 @@ const Index = () => {
         }
       }, 8000);
     } catch (error) {
+      console.error('Recording error:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'accéder au microphone",
@@ -255,12 +279,22 @@ const Index = () => {
       let audioUrl = null;
       
       if (traceType === 'voice' && audioBlob) {
-        const fileName = `trace_${Date.now()}.webm`;
+        // Déterminer l'extension en fonction du type
+        const extension = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        const fileName = `trace_${Date.now()}.${extension}`;
+        
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('voice-traces')
-          .upload(fileName, audioBlob);
+          .upload(fileName, audioBlob, {
+            contentType: audioBlob.type,
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw uploadError;
+        }
         
         const { data: urlData } = supabase.storage
           .from('voice-traces')
@@ -510,9 +544,12 @@ const Index = () => {
                       </div>
                       <audio 
                         controls 
+                        preload="auto"
                         src={URL.createObjectURL(audioBlob)}
                         className="w-full"
                         style={{ maxHeight: '40px' }}
+                        playsInline
+                        webkit-playsinline="true"
                       />
                       <Button 
                         onClick={() => {
