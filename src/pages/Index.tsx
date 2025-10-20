@@ -439,11 +439,11 @@ const Index = () => {
       {isAdmin && (
         <button
           onClick={() => navigate('/admin')}
-          className="absolute top-8 right-4 z-10 opacity-20 hover:opacity-100 transition-opacity duration-300"
+          className="absolute top-8 right-4 z-10 opacity-60 active:opacity-100 transition-opacity duration-300 p-2"
           style={{ top: `calc(env(safe-area-inset-top) + 3rem)` }}
           aria-label="Admin"
         >
-          <Shield className="w-4 h-4 text-muted-foreground" />
+          <Shield className="w-5 h-5 text-muted-foreground" />
         </button>
       )}
 
