@@ -233,7 +233,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
     currentEl.style.backgroundColor = '#9ca3af'; // Gris clair
     currentEl.style.border = '3px solid #ffffff'; // Bordure blanche
     currentEl.style.boxShadow = '0 0 12px rgba(156, 163, 175, 0.8)';
-    currentEl.style.zIndex = '200'; // Plus haut que les traces
+    currentEl.style.zIndex = '2'; // Un peu plus haut que les traces
     currentEl.style.pointerEvents = 'none';
     
     // Add pulse animation
@@ -289,7 +289,7 @@ const MapboxGlobe = ({ center, traces = [], userLocation, isTraceAccessible, get
       el.style.borderRadius = '50%';
       el.style.border = '3px solid #000'; // Bordure plus épaisse
       el.style.cursor = isAccessible ? 'pointer' : 'not-allowed';
-      el.style.zIndex = '100';
+      el.style.zIndex = '1';
       el.style.position = 'relative';
       el.style.transition = 'all 0.2s ease';
       

@@ -365,7 +365,7 @@ const Index = () => {
       </div>
 
       {/* Floating Action Button */}
-      <div className="absolute bottom-16 left-6 right-6 z-10">
+      <div className="absolute bottom-16 left-6 right-6 z-[10000]">
         {!isWriting ? (
           <Button
             onClick={() => setIsWriting(true)}
@@ -378,7 +378,7 @@ const Index = () => {
         ) : null}
         
         {isWriting && (
-          <Card className="absolute bottom-20 left-4 right-4 mx-auto max-w-md p-4 bg-white/90 backdrop-blur-sm shadow-lg z-[10000]">
+          <Card className="absolute bottom-20 left-4 right-4 mx-auto max-w-md p-4 bg-white/90 backdrop-blur-sm shadow-lg">
             <div className="space-y-4">
               <div className="flex gap-2 mb-4">
                 <Button 
