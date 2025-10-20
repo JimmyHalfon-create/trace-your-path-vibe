@@ -37,6 +37,7 @@ const Index = () => {
   const [mapRef, setMapRef] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const [recordingTime, setRecordingTime] = useState(0);
 
   // Système de proximité
   const { nearbyTraces, isTraceAccessible, getDistanceToTrace } = useProximity(location, traces);
@@ -173,14 +174,28 @@ const Index = () => {
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/webm' });
         setAudioBlob(blob);
+        setRecordingTime(0);
       };
 
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
+      setRecordingTime(0);
+
+      // Compte à rebours
+      const countdownInterval = setInterval(() => {
+        setRecordingTime((prev) => {
+          if (prev >= 8) {
+            clearInterval(countdownInterval);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
 
       // Auto-stop après 8 secondes
       setTimeout(() => {
+        clearInterval(countdownInterval);
         if (recorder.state === 'recording') {
           stopRecording();
           toast({
@@ -465,9 +480,20 @@ const Index = () => {
                   
                   {isRecording && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-center gap-2 text-red-600 font-medium">
-                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        Enregistrement en cours... (max 8s)
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <div className="flex items-center gap-2 text-red-600 font-medium">
+                          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                          Enregistrement en cours...
+                        </div>
+                        <div className="text-4xl font-bold text-primary">
+                          {recordingTime}s / 8s
+                        </div>
+                        <div className="w-full bg-border rounded-full h-2 overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-1000"
+                            style={{ width: `${(recordingTime / 8) * 100}%` }}
+                          />
+                        </div>
                       </div>
                       <Button onClick={stopRecording} variant="destructive" className="w-full">
                         <Square className="w-4 h-4 mr-2" />
