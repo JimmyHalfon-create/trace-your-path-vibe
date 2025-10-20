@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { MapPin, Plus, MessageSquare, Globe, Mic, Square, Navigation } from "lucide-react";
+import { MapPin, Plus, MessageSquare, Globe, Mic, Square, Navigation, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MapboxGlobe from "@/components/MapboxGlobe";
@@ -34,6 +35,8 @@ const Index = () => {
   const [mapError, setMapError] = useState<string | null>(null);
   const { toast } = useToast();
   const [mapRef, setMapRef] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
 
   // Système de proximité
   const { nearbyTraces, isTraceAccessible, getDistanceToTrace } = useProximity(location, traces);
@@ -103,6 +106,25 @@ const Index = () => {
       });
     }
   };
+
+  // Check admin status
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!!data);
+    };
+
+    checkAdmin();
+  }, []);
 
   // Update location periodically et initialize avec position par défaut
   useEffect(() => {
@@ -363,6 +385,18 @@ const Index = () => {
           </div>
         </Card>
       </div>
+
+      {/* Admin Button - Very discreet */}
+      {isAdmin && (
+        <button
+          onClick={() => navigate('/admin')}
+          className="absolute top-8 right-4 z-10 opacity-20 hover:opacity-100 transition-opacity duration-300"
+          style={{ top: `calc(env(safe-area-inset-top) + 3rem)` }}
+          aria-label="Admin"
+        >
+          <Shield className="w-4 h-4 text-muted-foreground" />
+        </button>
+      )}
 
       {/* Floating Action Button */}
       <div className="absolute bottom-16 left-6 right-6 z-[10000]">
