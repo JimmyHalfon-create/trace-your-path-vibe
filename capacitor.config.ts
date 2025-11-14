@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.808c9e1474e54037b5a045e850c57b1d',
+  appId: 'app.lovable.traceyourpath',
   appName: 'trace-your-path-vibe',
   webDir: 'dist',
   server: {
