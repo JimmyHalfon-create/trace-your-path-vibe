@@ -1,66 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>TRACE</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
-    
-    <!-- Script anti window.open et target="_blank" -->
-    <script>
-      (function () {
-        const _open = window.open;
-        window.open = function (url) {
-          if (url) location.href = url;
-          return null;
-        };
-        document.addEventListener('click', function (e) {
-          const a = e.target.closest('a[target="_blank"]');
-          if (a && a.href) {
-            e.preventDefault();
-            location.href = a.href;
-          }
-        }, true);
-      })();
-    </script>
-
-    <meta property="og:title" content="trace-your-path-vibe" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <title>TRACE — Messages anonymes géolocalisés</title>
+    <meta name="description" content="Laissez et découvrez des messages anonymes, texte ou vocaux, cachés partout dans le monde." />
+    <meta name="theme-color" content="#0b0d11" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TRACE" />
+    <meta property="og:title" content="TRACE" />
+    <meta property="og:description" content="Laissez et découvrez des messages anonymes cachés partout dans le monde." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:card" content="summary" />
   </head>
-
-  <body style="margin: 0; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+  <body class="dark">
     <div id="root"></div>
-    
-    <!-- Fallback en cas d'échec du chargement React -->
-    <div id="fallback" style="display: none; text-align: center; padding: 50px;">
-      <h1 style="font-size: 3rem; color: #fbbf24; margin-bottom: 1rem;">TRACE</h1>
-      <p>❌ React app failed to load</p>
-      <p>Timestamp: <span id="fallback-time"></span></p>
-      <p style="margin-top: 20px; font-size: 0.9rem; color: #6b7280;">
-        Si vous voyez ceci, c'est que l'HTML se charge mais pas React
-      </p>
-    </div>
-    
-    <script>
-      // Afficher le fallback si React ne se charge pas dans 3 secondes
-      setTimeout(() => {
-        if (!document.querySelector('#root > *')) {
-          document.getElementById('fallback').style.display = 'block';
-          document.getElementById('fallback-time').textContent = new Date().toLocaleTimeString();
-          console.error('TRACE: React app failed to load');
-        }
-      }, 3000);
-      
-      console.log('TRACE: HTML loaded at', new Date());
-    </script>
-    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

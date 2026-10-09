@@ -1,173 +1,53 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Shield } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Globe } from "lucide-react";
 
+/** Admin-only sign in. Successful login always leads to /admin. */
 const Auth = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        title: "Erreur",
-        description: "Le mot de passe doit contenir au moins 6 caractères",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      if (isLogin) {
-        const { error, data } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            throw new Error("Email ou mot de passe incorrect");
-          }
-          throw error;
-        }
-
-        console.log("User logged in:", data.user?.id);
-
-        // Attendre un peu pour que la session soit bien établie
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        toast({
-          title: "Connexion réussie",
-          description: "Redirection vers l'administration...",
-        });
-        setTimeout(() => navigate('/admin'), 100);
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-          },
-        });
-
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            throw new Error("Cet email est déjà utilisé");
-          }
-          throw error;
-        }
-
-        toast({
-          title: "Compte créé",
-          description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-        });
-        setIsLogin(true);
-      }
-    } catch (error: any) {
-      console.error("Auth error:", error);
-      toast({
-        title: "Erreur",
-        description: error.message || "Une erreur est survenue",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) return toast.error("Email ou mot de passe incorrect");
+    navigate("/admin", { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 space-y-6 bg-background/95 backdrop-blur-sm">
-        <div className="text-center space-y-2">
-          <Globe className="w-16 h-16 text-primary mx-auto" />
-          <h1 className="text-3xl font-bold text-primary">TRACE</h1>
-          <p className="text-muted-foreground">
-            {isLogin ? "Connectez-vous à votre compte" : "Créez votre compte"}
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-sm space-y-6 p-8">
+        <div className="space-y-2 text-center">
+          <Shield className="mx-auto h-12 w-12 text-primary" />
+          <h1 className="text-2xl font-bold tracking-widest text-primary">TRACE</h1>
+          <p className="text-sm text-muted-foreground">Accès administrateur</p>
         </div>
-
-        <form onSubmit={handleAuth} className="space-y-4">
+        <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="votre@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              required
-            />
+            <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password">Mot de passe</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-              minLength={6}
-            />
-            {!isLogin && (
-              <p className="text-xs text-muted-foreground">
-                Minimum 6 caractères
-              </p>
-            )}
+            <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Chargement..." : isLogin ? "Se connecter" : "Créer un compte"}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Connexion..." : "Se connecter"}
           </Button>
         </form>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-primary hover:underline"
-            disabled={isLoading}
-          >
-            {isLogin
-              ? "Pas encore de compte ? Créer un compte"
-              : "Déjà un compte ? Se connecter"}
-          </button>
-        </div>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Retour à l'accueil
-          </button>
-        </div>
+        <button onClick={() => navigate("/")} className="w-full text-center text-sm text-muted-foreground">
+          Retour à la carte
+        </button>
       </Card>
     </div>
   );
