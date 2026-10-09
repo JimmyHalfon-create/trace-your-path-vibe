@@ -105,3 +105,40 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  html, body, #root { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+}
+
+@layer utilities {
+  .safe-top { padding-top: calc(env(safe-area-inset-top) + 1rem); }
+  .safe-top-widgets { top: calc(env(safe-area-inset-top) + 4.5rem); }
+  .safe-bottom { bottom: calc(env(safe-area-inset-bottom) + 1.5rem); }
+}
+
+/* Map markers: size follows --marker-scale set on the map container */
+.user-marker {
+  width: calc(14px * max(var(--marker-scale, 1), 0.5));
+  height: calc(14px * max(var(--marker-scale, 1), 0.5));
+  border-radius: 9999px;
+  background: hsl(var(--muted-foreground));
+  border: 2px solid hsl(var(--foreground));
+  box-shadow: 0 0 0 6px hsl(var(--muted-foreground) / 0.25);
+  pointer-events: none;
+}
+.trace-marker {
+  width: calc(28px * var(--marker-scale, 1));
+  height: calc(28px * var(--marker-scale, 1));
+  min-width: 3px; min-height: 3px;
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--background));
+  padding: 0; cursor: pointer;
+}
+.trace-marker.is-unlocked {
+  background: hsl(var(--primary));
+  box-shadow: 0 0 10px hsl(var(--primary) / 0.7), 0 0 20px hsl(var(--primary) / 0.35);
+}
+.trace-marker.is-locked {
+  background: hsl(var(--muted-foreground));
+  box-shadow: 0 0 8px hsl(var(--muted-foreground) / 0.5);
+}

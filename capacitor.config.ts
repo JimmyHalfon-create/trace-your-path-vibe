@@ -2,29 +2,12 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.traceyourpath',
-  appName: 'trace-your-path-vibe',
+  appName: 'TRACE',
   webDir: 'dist',
-  server: {
-    url: 'https://808c9e14-74e5-4037-b5a0-45e850c57b1d.lovableproject.com',
-    cleartext: true,
-    androidScheme: 'https'
-  },
   plugins: {
-    CapacitorHttp: {
-      enabled: true,
-    },
-    LocalNotifications: {
-      smallIcon: "ic_stat_icon_config_sample",
-      iconColor: "#fbbf24",
-      sound: "beep.wav"
-    }
+    LocalNotifications: { iconColor: '#fbbf24' },
   },
-  ios: {
-    allowsLinkPreview: false,
-    scrollEnabled: false,
-    backgroundColor: '#000000',
-    limitsNavigationsToAppBoundDomains: true
-  }
+  ios: { backgroundColor: '#000000' },
 };
 
 export default config;
