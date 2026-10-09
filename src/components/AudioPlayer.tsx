@@ -1,165 +1,87 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { Pause, Play } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface AudioPlayerProps {
-  audioUrl: string;
-  className?: string;
-}
+const fmt = (t: number) =>
+  isFinite(t) ? `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}` : "0:00";
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, className = '' }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+/** Custom yellow/black player, mobile WebView friendly (no native controls). */
+const AudioPlayer = ({ src, className }: { src: string; className?: string }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Précharger l'audio avec compatibilité mobile maximale
-    const audio = new Audio();
-    
-    // Configuration pour compatibilité mobile/WebView
-    audio.preload = 'auto';
-    (audio as any).playsInline = true;
-    (audio as any)['webkit-playsinline'] = true;
-    audio.crossOrigin = 'anonymous';
-    
-    console.log('AudioPlayer: Loading audio from:', audioUrl);
-    
-    // Utiliser l'URL directement sans timestamp pour éviter les problèmes de cache
-    audio.src = audioUrl;
-    
-    const handleLoadedMetadata = () => {
-      console.log('AudioPlayer: Loaded metadata, duration:', audio.duration);
-      setDuration(audio.duration);
-      setIsLoading(false);
-      setError(false);
-    };
-    
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-    
-    const handleEnded = () => {
-      console.log('AudioPlayer: Playback ended');
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
-    
-    const handleError = (e: Event) => {
-      console.error('AudioPlayer: Loading error', {
-        error: audio.error,
-        code: audio.error?.code,
-        message: audio.error?.message,
-        url: audioUrl
-      });
+    setPlaying(false);
+    setTime(0);
+    setError(false);
+  }, [src]);
+
+  const toggle = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (playing) return a.pause();
+    try {
+      if (a.ended) a.currentTime = 0;
+      await a.play();
+    } catch (e) {
+      console.error("Lecture audio impossible", e);
       setError(true);
-      setIsLoading(false);
-    };
-    
-    const handleCanPlay = () => {
-      console.log('AudioPlayer: Can play audio');
-      setIsLoading(false);
-    };
-    
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('canplay', handleCanPlay);
-    
-    // Charger l'audio
-    audio.load();
-
-    audioRef.current = audio;
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        audioRef.current.removeEventListener('ended', handleEnded);
-        audioRef.current.removeEventListener('error', handleError);
-        audioRef.current.removeEventListener('canplay', handleCanPlay);
-        audioRef.current.src = '';
-      }
-    };
-  }, [audioUrl]);
-
-  const togglePlay = async () => {
-    if (!audioRef.current || error) {
-      console.error('AudioPlayer: Cannot play - no audio ref or error state');
-      return;
-    }
-
-    if (isPlaying) {
-      console.log('AudioPlayer: Pausing');
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      try {
-        console.log('AudioPlayer: Attempting to play');
-        
-        // Reset si à la fin
-        if (audioRef.current.currentTime >= audioRef.current.duration) {
-          audioRef.current.currentTime = 0;
-        }
-        
-        // Attendre que le play soit prêt
-        await audioRef.current.play();
-        console.log('AudioPlayer: Playing successfully');
-        setIsPlaying(true);
-      } catch (err) {
-        console.error('AudioPlayer: Playback error', err);
-        setError(true);
-        setIsPlaying(false);
-      }
     }
   };
 
-  const formatTime = (time: number) => {
-    if (!isFinite(time)) return '0:00';
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  // Webm/mp4 recordings often report Infinity duration until fully read.
+  const onMeta = () => {
+    const a = audioRef.current!;
+    if (isFinite(a.duration)) return setDuration(a.duration);
+    a.currentTime = 1e6;
+    a.ontimeupdate = () => {
+      a.ontimeupdate = null;
+      setDuration(a.duration);
+      a.currentTime = 0;
+    };
   };
-
-  if (error) {
-    return (
-      <div className={`flex items-center gap-3 p-3 bg-destructive/20 rounded-lg ${className}`}>
-        <span className="text-sm text-destructive">Erreur de lecture audio</span>
-      </div>
-    );
-  }
 
   return (
-    <div className={`flex items-center gap-3 p-3 bg-secondary/20 rounded-lg ${className}`}>
+    <div className={cn("flex items-center gap-3 rounded-lg bg-secondary/40 p-2", className)}>
+      <audio
+        ref={audioRef}
+        src={src}
+        preload="metadata"
+        playsInline
+        onLoadedMetadata={onMeta}
+        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        onError={() => setError(true)}
+      />
       <button
-        onClick={togglePlay}
-        disabled={isLoading}
-        className="w-10 h-10 rounded-full bg-[#F1C40F] flex items-center justify-center hover:bg-[#F1C40F]/90 transition-all disabled:opacity-50 shadow-md"
-        aria-label={isPlaying ? "Pause" : "Play"}
+        type="button"
+        onClick={toggle}
+        disabled={error}
+        aria-label={playing ? "Pause" : "Lecture"}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition active:scale-95 disabled:opacity-40"
       >
-        {isPlaying ? (
-          <Pause className="w-4 h-4 text-black" />
-        ) : (
-          <Play className="w-4 h-4 text-black ml-0.5" />
-        )}
+        {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
       </button>
-      
-      <Volume2 className="w-4 h-4 text-muted-foreground" />
-      
-      <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground">
-        <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-primary transition-all duration-100"
-            style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%' }}
-          />
+      {error ? (
+        <span className="text-sm text-destructive">Lecture impossible</span>
+      ) : (
+        <div className="flex flex-1 items-center gap-2">
+          <div className="h-1 flex-1 overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full bg-primary transition-all"
+              style={{ width: duration ? `${Math.min(100, (time / duration) * 100)}%` : "0%" }}
+            />
+          </div>
+          <span className="min-w-[72px] text-right text-xs text-muted-foreground">
+            {fmt(time)} / {fmt(duration)}
+          </span>
         </div>
-        <span className="text-xs min-w-[80px]">
-          {isLoading ? '...' : `${formatTime(currentTime)} / ${formatTime(duration)}`}
-        </span>
-      </div>
+      )}
     </div>
   );
 };
