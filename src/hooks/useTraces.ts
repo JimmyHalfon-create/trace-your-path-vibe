@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchTraces, traceDistance, UNLOCK_RADIUS_METERS, type LatLng, type Trace } from "@/lib/traces";
 import { notifyTraceNearby, requestNotificationPermission } from "@/lib/notifications";
 
@@ -32,9 +32,10 @@ export function useNearbyTraces(position: LatLng | null, traces: Trace[]) {
     requestNotificationPermission();
   }, []);
 
-  const nearby = position
-    ? traces.filter((t) => traceDistance(position, t) <= UNLOCK_RADIUS_METERS)
-    : [];
+  const nearby = useMemo(
+    () => (position ? traces.filter((t) => traceDistance(position, t) <= UNLOCK_RADIUS_METERS) : []),
+    [position, traces]
+  );
 
   useEffect(() => {
     nearby.forEach((t) => {
