@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type mapboxgl from "mapbox-gl";
-import { MessageSquare, Navigation, Plus, Shield } from "lucide-react";
+import { Loader2, MapPinOff, MessageSquare, Navigation, Plus, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -48,6 +48,21 @@ const Index = () => {
           <Shield className="h-5 w-5 text-muted-foreground" />
         </button>
       </header>
+
+      {/* Geolocation status banner */}
+      {geoError ? (
+        <Card className="absolute inset-x-4 top-20 z-30 flex items-center gap-3 border-destructive/50 bg-card/90 p-3 text-sm backdrop-blur">
+          <MapPinOff className="h-4 w-4 shrink-0 text-destructive" />
+          <span>{geoError}</span>
+        </Card>
+      ) : (
+        !position && (
+          <Card className="absolute inset-x-4 top-20 z-30 flex items-center gap-3 bg-card/80 p-3 text-sm text-muted-foreground backdrop-blur">
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
+            <span>Recherche de votre position…</span>
+          </Card>
+        )
+      )}
 
       {/* Side widgets */}
       <div className="safe-top-widgets absolute right-4 z-10 flex flex-col items-end gap-2">
