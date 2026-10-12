@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MAX_VOICE_SECONDS } from "@/lib/traces";
 
+/**
+ * The container must match a codec the platform can also play back.
+ * iOS: AAC inside .mp4. Chrome/Android: Opus inside .webm.
+ * Bare "audio/mp4" is last on purpose — Chromium muxes Opus into .mp4, which Safari cannot play.
+ */
 const pickMimeType = () =>
-  ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"].find(
+  ["audio/mp4;codecs=mp4a.40.2", "audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find(
     (t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)
   ) ?? "";
 

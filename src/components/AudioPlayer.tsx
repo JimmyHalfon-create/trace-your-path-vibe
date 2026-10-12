@@ -8,15 +8,44 @@ const fmt = (t: number) =>
 /** Custom yellow/black player, mobile WebView friendly (no native controls). */
 const AudioPlayer = ({ src, className }: { src: string; className?: string }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [url, setUrl] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(false);
 
+  /**
+   * Streamed .webm/.mp4 recordings report an unknown duration, and the previous
+   * seek-to-the-end trick fired onError and left the button disabled. Loading the
+   * file as a blob gives a real duration and plays the same way in every WebView.
+   */
   useEffect(() => {
+    let active = true;
+    let objectUrl: string | null = null;
+    setUrl(null);
     setPlaying(false);
     setTime(0);
+    setDuration(0);
     setError(false);
+
+    (async () => {
+      try {
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        if (!active) return;
+        objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+      } catch {
+        // Streaming the original URL is still better than nothing.
+        if (active) setUrl(src);
+      }
+    })();
+
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [src]);
 
   const toggle = async () => {
@@ -32,26 +61,17 @@ const AudioPlayer = ({ src, className }: { src: string; className?: string }) =>
     }
   };
 
-  // Webm/mp4 recordings often report Infinity duration until fully read.
-  const onMeta = () => {
-    const a = audioRef.current!;
-    if (isFinite(a.duration)) return setDuration(a.duration);
-    a.currentTime = 1e6;
-    a.ontimeupdate = () => {
-      a.ontimeupdate = null;
-      setDuration(a.duration);
-      a.currentTime = 0;
-    };
-  };
-
   return (
     <div className={cn("flex items-center gap-3 rounded-lg bg-secondary/40 p-2", className)}>
       <audio
         ref={audioRef}
-        src={src}
+        src={url ?? undefined}
         preload="metadata"
         playsInline
-        onLoadedMetadata={onMeta}
+        onLoadedMetadata={(e) => {
+          const d = e.currentTarget.duration;
+          if (isFinite(d)) setDuration(d);
+        }}
         onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
