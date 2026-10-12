@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# TRACE — messages anonymes géolocalisés
 
 ## Project info
 
