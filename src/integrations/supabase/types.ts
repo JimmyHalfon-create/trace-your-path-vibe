@@ -40,6 +40,9 @@ export type Database = {
           latitude: number
           longitude: number
           message: string
+          moderated_at: string | null
+          moderation_flag: boolean | null
+          moderation_reason: string | null
           trace_type: string
         }
         Insert: {
@@ -49,6 +52,9 @@ export type Database = {
           latitude: number
           longitude: number
           message: string
+          moderated_at?: string | null
+          moderation_flag?: boolean | null
+          moderation_reason?: string | null
           trace_type?: string
         }
         Update: {
@@ -58,6 +64,9 @@ export type Database = {
           latitude?: number
           longitude?: number
           message?: string
+          moderated_at?: string | null
+          moderation_flag?: boolean | null
+          moderation_reason?: string | null
           trace_type?: string
         }
         Relationships: []
