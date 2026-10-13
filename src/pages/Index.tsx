@@ -44,9 +44,7 @@ const Index = () => {
         <Card className="bg-card/80 px-5 py-2 backdrop-blur">
           <h1 className="text-xl font-bold tracking-widest text-primary">TRACE</h1>
         </Card>
-        <button onClick={() => navigate("/auth")} aria-label="Admin" className="p-2 opacity-30">
-          <Shield className="h-5 w-5 text-muted-foreground" />
-        </button>
+        <span className="w-9" />
       </header>
 
       {/* Geolocation status banner */}
