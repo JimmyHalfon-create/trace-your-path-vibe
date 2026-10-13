@@ -14,9 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      trace_rate_limits: {
+        Row: {
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip_hash?: string
+        }
+        Relationships: []
+      }
       traces: {
         Row: {
-          audio_url: string | null
+          audio_path: string | null
           created_at: string
           id: string
           latitude: number
@@ -25,7 +43,7 @@ export type Database = {
           trace_type: string
         }
         Insert: {
-          audio_url?: string | null
+          audio_path?: string | null
           created_at?: string
           id?: string
           latitude: number
@@ -34,7 +52,7 @@ export type Database = {
           trace_type?: string
         }
         Update: {
-          audio_url?: string | null
+          audio_path?: string | null
           created_at?: string
           id?: string
           latitude?: number
@@ -70,6 +88,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_trace_markers: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          trace_type: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
