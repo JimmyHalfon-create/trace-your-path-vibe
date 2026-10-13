@@ -166,16 +166,16 @@ All colors MUST be HSL.
 
 /* Mapbox mark: required by Mapbox's terms, so it stays visible — but small, quiet
    and tucked in the corner, clear of the "Laisser une Trace" button. */
-.mapboxgl-ctrl-bottom-left {
-  bottom: calc(env(safe-area-inset-bottom) + 5px);
+.mapboxgl-map .mapboxgl-ctrl-bottom-left {
+  bottom: calc(env(safe-area-inset-bottom) + 8px);
   left: 6px;
 }
-.mapboxgl-ctrl-bottom-left .mapboxgl-ctrl {
+.mapboxgl-map .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl {
   margin: 0;
 }
 .mapboxgl-ctrl-logo {
   transform-origin: 0 100%;
-  transform: scale(0.62);
+  transform: scale(0.55);
   opacity: 0.4;
   transition: opacity 0.2s ease;
 }
