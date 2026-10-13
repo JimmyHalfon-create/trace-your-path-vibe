@@ -81,6 +81,33 @@ async function moderate(apiKey: string, items: { id: string; message: string }[]
   }
 }
 
+async function transcribe(apiKey: string, blob: Blob, path: string): Promise<string | null> {
+  const isMp4 = path.endsWith(".mp4") || path.endsWith(".m4a");
+  const fd = new FormData();
+  fd.append("model", "openai/gpt-transcribe");
+  fd.append("stream", "true");
+  fd.append("file", new Blob([blob], { type: isMp4 ? "audio/mp4" : "audio/webm" }), isMp4 ? "audio.mp4" : "audio.webm");
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
+    method: "POST",
+    headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+    body: fd,
+  });
+  if (!res.ok) { console.error("transcribe", res.status, await res.text().catch(() => "")); return null; }
+  const raw = await res.text();
+  let text = "", done: string | null = null;
+  for (const line of raw.split("\n")) {
+    if (!line.startsWith("data:")) continue;
+    const d = line.slice(5).trim();
+    if (!d || d === "[DONE]") continue;
+    try {
+      const ev = JSON.parse(d);
+      if (ev.type === "transcript.text.delta") text += ev.delta ?? "";
+      if (ev.type === "transcript.text.done") done = ev.text ?? null;
+    } catch { /* ignore */ }
+  }
+  return (done ?? text).trim();
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method" }, 405);
@@ -99,19 +126,31 @@ Deno.serve(async (req) => {
 
   const { data: rows } = await db
     .from("traces")
-    .select("id, message, trace_type")
+    .select("id, message, trace_type, audio_path")
     .is("moderated_at", null)
     .order("created_at", { ascending: false })
     .limit(BATCH);
   if (!rows?.length) return json({ analysed: 0, remaining: false });
 
   const now = new Date().toISOString();
-  // Voice traces have no text to analyse: mark them so they are not re-queued.
-  const voice = rows.filter((r) => r.trace_type !== "text");
-  if (voice.length)
-    await db.from("traces").update({ moderated_at: now, moderation_flag: null }).in("id", voice.map((r) => r.id));
+  // Voice traces: transcribe first, then moderate the transcript like text.
+  const voiceItems: { id: string; message: string }[] = [];
+  for (const r of rows.filter((r) => r.trace_type !== "text")) {
+    let transcript: string | null = null;
+    if (r.audio_path) {
+      const { data: file } = await db.storage.from("voice-traces").download(r.audio_path);
+      if (file) transcript = await transcribe(apiKey, file, r.audio_path);
+    }
+    if (transcript === null) continue; // retry on next run
+    if (!transcript) {
+      await db.from("traces").update({ transcript: "", moderated_at: now, moderation_flag: false }).eq("id", r.id);
+      continue;
+    }
+    await db.from("traces").update({ transcript: transcript.slice(0, 500) }).eq("id", r.id);
+    voiceItems.push({ id: r.id, message: transcript.slice(0, 500) });
+  }
 
-  const texts = rows.filter((r) => r.trace_type === "text").map((r) => ({ id: r.id, message: r.message }));
+  const texts = rows.filter((r) => r.trace_type === "text").map((r) => ({ id: r.id, message: r.message })).concat(voiceItems);
   if (texts.length) {
     const out = await moderate(apiKey, texts);
     if ("error" in out) return json({ error: out.error }, out.status ?? 502);
