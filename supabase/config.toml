@@ -4,3 +4,6 @@ verify_jwt = false
 
 [functions.trace-content]
 verify_jwt = false
+
+[functions.moderate-traces]
+verify_jwt = false

@@ -21,11 +21,26 @@ export interface TraceContent {
   created_at: string;
 }
 
-/** Admin view (full row + signed audio URL). */
+/** Admin view (full row + signed audio URL + AI moderation verdict). */
 export interface AdminTrace extends Trace {
   message: string;
   audio_path: string | null;
   audio_url: string | null;
+  moderation_flag: boolean | null;
+  moderation_reason: string | null;
+  moderated_at: string | null;
+}
+
+/** Runs AI moderation on not-yet-analysed traces (admin only). Loops over batches. */
+export async function moderatePendingTraces(): Promise<number> {
+  let total = 0;
+  for (let i = 0; i < 10; i++) {
+    const { data, error } = await supabase.functions.invoke("moderate-traces", { body: {} });
+    if (error) throw await functionError(error, "Analyse IA impossible");
+    total += data?.analysed ?? 0;
+    if (!data?.remaining) break;
+  }
+  return total;
 }
 
 export interface LatLng {
@@ -110,13 +125,16 @@ export async function fetchAdminTraces(): Promise<AdminTrace[]> {
     const { data: signed } = await supabase.storage.from(AUDIO_BUCKET).createSignedUrls(paths, 600);
     signed?.forEach((s) => s.path && s.signedUrl && urls.set(s.path, s.signedUrl));
   }
-  return rows.map((r) => ({
-    ...r,
-    latitude: Number(r.latitude),
-    longitude: Number(r.longitude),
-    trace_type: r.trace_type as TraceType,
-    audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
-  }));
+  return rows
+    .map((r) => ({
+      ...r,
+      latitude: Number(r.latitude),
+      longitude: Number(r.longitude),
+      trace_type: r.trace_type as TraceType,
+      audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
+    }))
+    // Flagged first, then newest (rows already sorted by date; sort is stable).
+    .sort((a, b) => Number(!!b.moderation_flag) - Number(!!a.moderation_flag));
 }
 
 export async function deleteTrace(trace: AdminTrace): Promise<void> {
