@@ -10,3 +10,4 @@
 - RLS policies on `user_roles` must never query `user_roles` itself — a self-referencing policy caused infinite recursion that broke every delete; role checks go through the SECURITY DEFINER `has_role` function.
 - Recorded audio must pair a container with a codec the same platform can play back (AAC in `.mp4` on iOS, Opus in `.webm` elsewhere) — Chromium muxes Opus into `.mp4`, which Safari silently refuses to play.
 - The opening splash lives in `Index` only and shows once per JS load (module flag) — keeps it off /admin and /auth and off background resumes; GPS/notification requests wait until it ends.
+- AI moderation runs only in the admin-only `moderate-traces` edge function (verdict stored on `traces`, `moderated_at` marks analysed rows); the admin page triggers it on load and sorts flagged traces first — no AI key or prompt in the client.
