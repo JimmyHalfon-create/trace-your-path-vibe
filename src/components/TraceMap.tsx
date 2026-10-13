@@ -12,6 +12,9 @@ const MAPBOX_TOKEN =
 const zoomScale = (zoom: number) =>
   zoom <= 2 ? 0.15 + zoom * 0.03 : zoom <= 8 ? 0.2 + ((zoom - 2) / 6) * 0.8 : 1 + (zoom - 8) * 0.1;
 
+// Stop clustering before the map's maximum zoom, including identical GPS points.
+const CLUSTER_MAX_ZOOM = 17;
+
 interface Props {
   user: LatLng | null;
   traces: Trace[];
@@ -110,6 +113,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
       traceMarkers.current.forEach((marker) => marker.remove());
       traceMarkers.current = [];
       const seen = new Set<string>();
+      const individualMarkers: { marker: mapboxgl.Marker; point: mapboxgl.Point }[] = [];
       for (const feature of m.querySourceFeatures(sourceId)) {
         if (feature.geometry.type !== "Point") continue;
         const properties = feature.properties;
@@ -142,7 +146,30 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
             m.easeTo({ center, zoom: Math.min(zoom, m.getMaxZoom()), duration: 600 });
           });
         });
-        traceMarkers.current.push(new mapboxgl.Marker({ element: el }).setLngLat(center).addTo(m));
+        const marker = new mapboxgl.Marker({ element: el }).setLngLat(center).addTo(m);
+        traceMarkers.current.push(marker);
+        if (!clustered) individualMarkers.push({ marker, point: m.project(center) });
+      }
+      // At close zoom, separate overlapping buttons visually, never their GPS data.
+      if (m.getZoom() > CLUSTER_MAX_ZOOM) {
+        const remaining = new Set(individualMarkers);
+        const spacing = 28 * zoomScale(m.getZoom()) + 6;
+        for (const item of individualMarkers) {
+          if (!remaining.delete(item)) continue;
+          const group = [item];
+          for (const other of remaining) {
+            if (item.point.dist(other.point) < spacing) {
+              group.push(other);
+              remaining.delete(other);
+            }
+          }
+          if (group.length < 2) continue;
+          const radius = Math.max(spacing / 2, (group.length * spacing) / (2 * Math.PI));
+          group.forEach(({ marker }, index) => {
+            const angle = (index / group.length) * 2 * Math.PI;
+            marker.setOffset([Math.cos(angle) * radius, Math.sin(angle) * radius]);
+          });
+        }
       }
     };
 
@@ -152,7 +179,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
       if (existing) existing.setData(data);
       else m.addSource(sourceId, {
         type: "geojson", data, cluster: true, clusterRadius: 32,
-        clusterMaxZoom: 22, maxzoom: 24,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM, maxzoom: CLUSTER_MAX_ZOOM + 2,
       });
       // Invisible layer ensures Mapbox loads and updates the source's visible tiles.
       if (!m.getLayer(sourceId)) m.addLayer({
