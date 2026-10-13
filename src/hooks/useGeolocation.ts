@@ -8,11 +8,12 @@ const ERRORS: Record<number, string> = {
 };
 
 /** Watches the user's position continuously. */
-export function useGeolocation() {
+export function useGeolocation(enabled = true) {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) return;
     if (!navigator.geolocation) {
       setError("Géolocalisation non supportée");
       return;
@@ -26,7 +27,7 @@ export function useGeolocation() {
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
     return () => navigator.geolocation.clearWatch(id);
-  }, []);
+  }, [enabled]);
 
   const refresh = useCallback(
     () =>
