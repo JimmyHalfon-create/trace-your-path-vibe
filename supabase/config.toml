@@ -1,1 +1,6 @@
 project_id = "volxkeeyvdkxwigtbvkx"
+[functions.create-trace]
+verify_jwt = false
+
+[functions.trace-content]
+verify_jwt = false
