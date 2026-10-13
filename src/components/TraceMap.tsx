@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import type { FeatureCollection, Point } from "geojson";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { LatLng, Trace } from "@/lib/traces";
 
@@ -95,7 +96,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
     const sourceId = "trace-clusters";
     const byId = new Map(traces.map((t) => [t.id, t]));
     let disposed = false;
-    const data: GeoJSON.FeatureCollection<GeoJSON.Point> = {
+    const data: FeatureCollection<Point> = {
       type: "FeatureCollection",
       features: traces.map((t) => ({
         type: "Feature",
@@ -128,7 +129,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
           : `trace-marker ${trace && isUnlocked(trace) ? "is-unlocked" : "is-locked"}`;
         el.setAttribute("aria-label", clustered ? `${properties.point_count} traces — zoomer` : "Trace");
         if (clustered) el.textContent = String(properties.point_count);
-        el.addEventListener("click", async (event) => {
+        el.addEventListener("click", (event) => {
           event.stopPropagation();
           if (!clustered) {
             if (trace) onSelect(trace);
@@ -136,12 +137,10 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
           }
           const source = m.getSource(sourceId) as mapboxgl.GeoJSONSource | undefined;
           if (!source) return;
-          try {
-            const zoom = await source.getClusterExpansionZoom(Number(properties.cluster_id));
-            if (!disposed) m.easeTo({ center, zoom: Math.min(zoom, m.getMaxZoom()), duration: 600 });
-          } catch {
-            // A data refresh can retire the clicked cluster before zoom resolves.
-          }
+          source.getClusterExpansionZoom(Number(properties.cluster_id), (error, zoom) => {
+            if (error || disposed || zoom == null) return;
+            m.easeTo({ center, zoom: Math.min(zoom, m.getMaxZoom()), duration: 600 });
+          });
         });
         traceMarkers.current.push(new mapboxgl.Marker({ element: el }).setLngLat(center).addTo(m));
       }
