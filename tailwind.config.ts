@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       colors: {
+        tag: { paper: "hsl(var(--tag-paper))", ink: "hsl(var(--tag-ink))" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
