@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Lock, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import AudioPlayer from "@/components/AudioPlayer";
+import { t } from "@/lib/i18n";
 import { fetchTraceContent, formatDate, type LatLng, type Trace, type TraceContent } from "@/lib/traces";
 
 interface Props {
@@ -32,7 +33,7 @@ const TraceDetail = ({ trace, unlocked, distance, position, onClose }: Props) =>
 
   return (
     <Card className="relative space-y-3 p-4 shadow-xl">
-      <button onClick={onClose} aria-label="Fermer" className="absolute right-3 top-3 text-muted-foreground">
+      <button onClick={onClose} aria-label={t.close} className="absolute right-3 top-3 text-muted-foreground">
         <X className="h-4 w-4" />
       </button>
       {unlocked ? (
@@ -52,9 +53,9 @@ const TraceDetail = ({ trace, unlocked, distance, position, onClose }: Props) =>
         <div className="flex items-center gap-3 pr-6">
           <Lock className="h-5 w-5 text-primary" />
           <div>
-            <p className="font-medium text-foreground">Trace verrouillée</p>
+            <p className="font-medium text-foreground">{t.locked}</p>
             <p className="text-sm text-muted-foreground">
-              Rapprochez-vous pour la découvrir
+              {t.getCloser}
               {distance !== null && ` · ${distance >= 1000 ? `${(distance / 1000).toFixed(1)} km` : `${Math.round(distance)} m`}`}
             </p>
           </div>
