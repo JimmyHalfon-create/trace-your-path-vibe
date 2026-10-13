@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { t } from "@/lib/i18n";
 
 // Module-level flag: survives in-app navigation and background resume,
 // resets only when the JS bundle reloads (cold launch).
@@ -38,7 +39,7 @@ const OpeningSplash = ({ onDone }: { onDone: () => void }) => {
         </svg>
       </div>
       <h1 className="splash-title mt-5 text-4xl font-bold tracking-widest text-primary">TRACE</h1>
-      <p className="splash-tagline mt-3 text-center text-sm text-foreground/85">Some words belong to a place.</p>
+      <p className="splash-tagline mt-3 text-center text-sm text-foreground/85">{t.tagline}</p>
     </div>
   );
 };
