@@ -46,7 +46,7 @@ const TraceComposer = ({ position, onClose, onCreated }: Props) => {
       onClose();
     } catch (e) {
       console.error(e);
-      toast.error("Impossible de déposer la trace");
+      toast.error(e instanceof Error ? e.message : "Impossible de déposer la trace");
     } finally {
       setSending(false);
     }

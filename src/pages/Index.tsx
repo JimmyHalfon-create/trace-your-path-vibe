@@ -89,6 +89,7 @@ const Index = () => {
             trace={selected}
             unlocked={isUnlocked(selected)}
             distance={position ? traceDistance(position, selected) : null}
+            position={position}
             onClose={() => setSelected(null)}
           />
         ) : (

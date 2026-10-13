@@ -2,13 +2,28 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type TraceType = "text" | "voice";
 
+/** Public marker data — never contains text or audio. */
 export interface Trace {
   id: string;
-  message: string;
   latitude: number;
   longitude: number;
   created_at: string;
   trace_type: TraceType;
+}
+
+/** Content, delivered by the server only within the unlock radius. */
+export interface TraceContent {
+  id: string;
+  trace_type: TraceType;
+  message: string | null;
+  audio_url: string | null; // short-lived signed URL
+  created_at: string;
+}
+
+/** Admin view (full row + signed audio URL). */
+export interface AdminTrace extends Trace {
+  message: string;
+  audio_path: string | null;
   audio_url: string | null;
 }
 
@@ -45,46 +60,71 @@ export const formatDate = (iso: string) =>
     minute: "2-digit",
   });
 
+async function functionError(error: unknown, fallback: string): Promise<Error> {
+  const ctx = (error as { context?: Response })?.context;
+  try {
+    const body = await ctx?.json();
+    if (body?.error) return new Error(body.error);
+  } catch { /* ignore */ }
+  return new Error(fallback);
+}
+
 export async function fetchTraces(): Promise<Trace[]> {
-  const { data, error } = await supabase
-    .from("traces")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.rpc("get_trace_markers");
   if (error) throw error;
-  return (data ?? []) as Trace[];
+  return (data ?? []).map((t) => ({ ...t, latitude: Number(t.latitude), longitude: Number(t.longitude) })) as Trace[];
+}
+
+export async function fetchTraceContent(id: string, position: LatLng): Promise<TraceContent> {
+  const { data, error } = await supabase.functions.invoke("trace-content", {
+    body: { id, lat: position.lat, lng: position.lng },
+  });
+  if (error) throw await functionError(error, "Trace inaccessible");
+  return data as TraceContent;
 }
 
 export async function createTrace(
   position: LatLng,
   input: { type: "text"; message: string } | { type: "voice"; audio: Blob }
 ): Promise<void> {
-  let audioUrl: string | null = null;
-
-  if (input.type === "voice") {
-    const ext = input.audio.type.includes("mp4") ? "mp4" : "webm";
-    const fileName = `trace_${Date.now()}_${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from(AUDIO_BUCKET)
-      .upload(fileName, input.audio, { contentType: input.audio.type, upsert: false });
-    if (uploadError) throw uploadError;
-    audioUrl = supabase.storage.from(AUDIO_BUCKET).getPublicUrl(fileName).data.publicUrl;
-  }
-
-  const { error } = await supabase.from("traces").insert({
-    latitude: position.lat,
-    longitude: position.lng,
-    message: input.type === "text" ? input.message.trim().slice(0, MAX_TEXT_LENGTH) : "Message vocal",
-    trace_type: input.type,
-    audio_url: audioUrl,
-  });
-  if (error) throw error;
+  const form = new FormData();
+  form.append("type", input.type);
+  form.append("lat", String(position.lat));
+  form.append("lng", String(position.lng));
+  if (input.type === "text") form.append("message", input.message.trim().slice(0, MAX_TEXT_LENGTH));
+  else form.append("audio", input.audio, input.audio.type.includes("mp4") ? "a.mp4" : "a.webm");
+  const { error } = await supabase.functions.invoke("create-trace", { body: form });
+  if (error) throw await functionError(error, "Envoi impossible");
 }
 
-export async function deleteTrace(trace: Trace): Promise<void> {
-  if (trace.audio_url) {
-    const fileName = trace.audio_url.split(`/${AUDIO_BUCKET}/`)[1];
-    if (fileName) await supabase.storage.from(AUDIO_BUCKET).remove([fileName]);
-  }
-  const { error } = await supabase.from("traces").delete().eq("id", trace.id);
+// ---------- Admin (RLS: admin role only) ----------
+
+export async function fetchAdminTraces(): Promise<AdminTrace[]> {
+  const { data, error } = await supabase.from("traces").select("*").order("created_at", { ascending: false });
   if (error) throw error;
+  const rows = data ?? [];
+  const paths = rows.map((r) => r.audio_path).filter((p): p is string => !!p);
+  const urls = new Map<string, string>();
+  if (paths.length) {
+    const { data: signed } = await supabase.storage.from(AUDIO_BUCKET).createSignedUrls(paths, 600);
+    signed?.forEach((s) => s.path && s.signedUrl && urls.set(s.path, s.signedUrl));
+  }
+  return rows.map((r) => ({
+    ...r,
+    latitude: Number(r.latitude),
+    longitude: Number(r.longitude),
+    trace_type: r.trace_type as TraceType,
+    audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
+  }));
+}
+
+export async function deleteTrace(trace: AdminTrace): Promise<void> {
+  if (trace.audio_path) {
+    const { data, error } = await supabase.storage.from(AUDIO_BUCKET).remove([trace.audio_path]);
+    if (error) throw error;
+    if (!data?.length) console.warn("Fichier audio déjà absent", trace.audio_path);
+  }
+  const { data, error } = await supabase.from("traces").delete().eq("id", trace.id).select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("Suppression refusée");
 }
