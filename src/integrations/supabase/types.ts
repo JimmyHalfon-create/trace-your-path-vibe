@@ -44,6 +44,7 @@ export type Database = {
           moderation_flag: boolean | null
           moderation_reason: string | null
           trace_type: string
+          transcript: string | null
         }
         Insert: {
           audio_path?: string | null
@@ -56,6 +57,7 @@ export type Database = {
           moderation_flag?: boolean | null
           moderation_reason?: string | null
           trace_type?: string
+          transcript?: string | null
         }
         Update: {
           audio_path?: string | null
@@ -68,6 +70,7 @@ export type Database = {
           moderation_flag?: boolean | null
           moderation_reason?: string | null
           trace_type?: string
+          transcript?: string | null
         }
         Relationships: []
       }
