@@ -111,7 +111,12 @@ const Admin = () => {
                   <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
                 </div>
                 {t.trace_type === "voice" && t.audio_url ? (
-                  <AudioPlayer src={t.audio_url} />
+                  <>
+                    <AudioPlayer src={t.audio_url} />
+                    {t.transcript ? (
+                      <p className="break-words text-sm italic text-muted-foreground">« {t.transcript} »</p>
+                    ) : null}
+                  </>
                 ) : (
                   <p className="break-words text-foreground">{t.message}</p>
                 )}

@@ -29,6 +29,7 @@ export interface AdminTrace extends Trace {
   moderation_flag: boolean | null;
   moderation_reason: string | null;
   moderated_at: string | null;
+  transcript: string | null;
 }
 
 /** Runs AI moderation on not-yet-analysed traces (admin only). Loops over batches. */
