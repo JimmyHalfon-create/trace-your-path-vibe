@@ -142,3 +142,24 @@ All colors MUST be HSL.
   background: hsl(var(--muted-foreground));
   box-shadow: 0 0 8px hsl(var(--muted-foreground) / 0.5);
 }
+.trace-cluster {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--background));
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  box-shadow: 0 0 10px hsl(var(--primary) / 0.35);
+}
+.trace-cluster:focus-visible, .trace-marker:focus-visible {
+  outline: 2px solid hsl(var(--foreground));
+  outline-offset: 3px;
+}
