@@ -9,3 +9,4 @@
 - Native-only features (notifications) are guarded by `Capacitor.isNativePlatform()` — the same code runs on web.
 - RLS policies on `user_roles` must never query `user_roles` itself — a self-referencing policy caused infinite recursion that broke every delete; role checks go through the SECURITY DEFINER `has_role` function.
 - Recorded audio must pair a container with a codec the same platform can play back (AAC in `.mp4` on iOS, Opus in `.webm` elsewhere) — Chromium muxes Opus into `.mp4`, which Safari silently refuses to play.
+- The opening splash lives in `Index` only and shows once per JS load (module flag) — keeps it off /admin and /auth and off background resumes; GPS/notification requests wait until it ends.
