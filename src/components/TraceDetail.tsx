@@ -1,3 +1,4 @@
+import TagView from "@/components/TagView";
 import { useEffect, useState } from "react";
 import { Loader2, Lock, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -42,6 +43,8 @@ const TraceDetail = ({ trace, unlocked, distance, position, onClose }: Props) =>
             <p className="pr-6 text-sm text-destructive">{error}</p>
           ) : !content ? (
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          ) : content.trace_type === "tag" && content.drawing ? (
+            <TagView drawing={content.drawing} className="mx-auto w-48" />
           ) : content.trace_type === "voice" && content.audio_url ? (
             <AudioPlayer src={content.audio_url} />
           ) : (

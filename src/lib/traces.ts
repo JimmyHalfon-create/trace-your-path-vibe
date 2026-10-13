@@ -1,7 +1,11 @@
 import { t } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
-export type TraceType = "text" | "voice";
+export type TraceType = "text" | "voice" | "tag";
+
+/** Tag drawing: strokes of flat [x,y,x,y…] integers on a 0–TAG_GRID square. */
+export type TagDrawing = number[][];
+export const TAG_GRID = 200;
 
 /** Public marker data — never contains text or audio. */
 export interface Trace {
@@ -18,6 +22,7 @@ export interface TraceContent {
   trace_type: TraceType;
   message: string | null;
   audio_url: string | null; // short-lived signed URL
+  drawing: TagDrawing | null;
   created_at: string;
 }
 
@@ -25,6 +30,7 @@ export interface TraceContent {
 export interface AdminTrace extends Trace {
   message: string;
   audio_path: string | null;
+  drawing: TagDrawing | null;
   audio_url: string | null;
   moderation_flag: boolean | null;
   moderation_reason: string | null;
@@ -102,13 +108,14 @@ export async function fetchTraceContent(id: string, position: LatLng): Promise<T
 
 export async function createTrace(
   position: LatLng,
-  input: { type: "text"; message: string } | { type: "voice"; audio: Blob }
+  input: { type: "text"; message: string } | { type: "voice"; audio: Blob } | { type: "tag"; drawing: TagDrawing }
 ): Promise<void> {
   const form = new FormData();
   form.append("type", input.type);
   form.append("lat", String(position.lat));
   form.append("lng", String(position.lng));
   if (input.type === "text") form.append("message", input.message.trim().slice(0, MAX_TEXT_LENGTH));
+  else if (input.type === "tag") form.append("drawing", JSON.stringify(input.drawing));
   else form.append("audio", input.audio, input.audio.type.includes("mp4") ? "a.mp4" : "a.webm");
   const { error } = await supabase.functions.invoke("create-trace", { body: form });
   if (error) throw await functionError(error, "Envoi impossible");
@@ -132,6 +139,7 @@ export async function fetchAdminTraces(): Promise<AdminTrace[]> {
       latitude: Number(r.latitude),
       longitude: Number(r.longitude),
       trace_type: r.trace_type as TraceType,
+      drawing: (r.drawing as TagDrawing | null) ?? null,
       audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
     }))
     // Flagged first, then newest (rows already sorted by date; sort is stable).

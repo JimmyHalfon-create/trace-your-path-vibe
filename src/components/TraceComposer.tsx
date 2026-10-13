@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { Mic, MessageSquare, Square, RotateCcw } from "lucide-react";
+import { Mic, MessageSquare, PenLine, Square, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import AudioPlayer from "@/components/AudioPlayer";
+import TagPad from "@/components/TagPad";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { t } from "@/lib/i18n";
-import { createTrace, MAX_TEXT_LENGTH, MAX_VOICE_SECONDS, type LatLng, type TraceType } from "@/lib/traces";
+import { createTrace, MAX_TEXT_LENGTH, MAX_VOICE_SECONDS, type LatLng, type TagDrawing, type TraceType } from "@/lib/traces";
 
 interface Props {
   position: LatLng | null;
@@ -19,6 +20,7 @@ const TraceComposer = ({ position, onClose, onCreated }: Props) => {
   const [type, setType] = useState<TraceType>("text");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [drawing, setDrawing] = useState<TagDrawing>([]);
   const rec = useVoiceRecorder();
 
   const previewUrl = useMemo(() => (rec.audio ? URL.createObjectURL(rec.audio) : null), [rec.audio]);
@@ -32,7 +34,7 @@ const TraceComposer = ({ position, onClose, onCreated }: Props) => {
     }
   };
 
-  const canSubmit = !!position && !sending && (type === "text" ? message.trim().length > 0 : !!rec.audio);
+  const canSubmit = !!position && !sending && (type === "text" ? message.trim().length > 0 : type === "tag" ? drawing.some((s) => s.length >= 4) : !!rec.audio);
 
   const submit = async () => {
     if (!position) return toast.error(t.positionNotFoundEnable);
@@ -40,7 +42,7 @@ const TraceComposer = ({ position, onClose, onCreated }: Props) => {
     try {
       await createTrace(
         position,
-        type === "text" ? { type: "text", message } : { type: "voice", audio: rec.audio! }
+        type === "text" ? { type: "text", message } : type === "tag" ? { type: "tag", drawing } : { type: "voice", audio: rec.audio! }
       );
       toast.success(t.traceDropped);
       onCreated();
@@ -66,9 +68,14 @@ const TraceComposer = ({ position, onClose, onCreated }: Props) => {
         >
           <Mic className="mr-2 h-4 w-4" /> {t.voice}
         </Button>
+        <Button variant={type === "tag" ? "default" : "outline"} className="flex-1" onClick={() => setType("tag")}>
+          <PenLine className="mr-2 h-4 w-4" /> {t.tag}
+        </Button>
       </div>
 
-      {type === "text" ? (
+      {type === "tag" ? (
+        <TagPad value={drawing} onChange={setDrawing} />
+      ) : type === "text" ? (
         <div className="space-y-1">
           <Textarea
             autoFocus

@@ -49,12 +49,13 @@ Deno.serve(async (req) => {
   const type = form.get("type");
   const lat = Number(form.get("lat"));
   const lng = Number(form.get("lng"));
-  if (type !== "text" && type !== "voice") return json({ error: "Type invalide" }, 400);
+  if (type !== "text" && type !== "voice" && type !== "tag") return json({ error: "Type invalide" }, 400);
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
     return json({ error: "Coordonnées invalides" }, 400);
 
   let message = "Message vocal";
   let audioPath: string | null = null;
+  let drawing: number[][] | null = null;
 
   if (type === "text") {
     const raw = form.get("message");
@@ -62,6 +63,21 @@ Deno.serve(async (req) => {
     message = raw.trim();
     if (!message || [...message].length > MAX_TEXT) return json({ error: `1 à ${MAX_TEXT} caractères` }, 400);
     if (form.get("audio")) return json({ error: "Une trace texte ne contient pas d'audio" }, 400);
+  } else if (type === "tag") {
+    if (form.get("message") || form.get("audio")) return json({ error: "Un tag ne contient que le dessin" }, 400);
+    message = "Tag";
+    try {
+      const raw = JSON.parse(String(form.get("drawing") ?? ""));
+      if (!Array.isArray(raw) || raw.length < 1 || raw.length > 60) throw 0;
+      let points = 0;
+      for (const s of raw) {
+        if (!Array.isArray(s) || s.length < 2 || s.length % 2) throw 0;
+        for (const v of s) if (!Number.isInteger(v) || v < 0 || v > 200) throw 0;
+        points += s.length / 2;
+      }
+      if (points < 2 || points > 1500) throw 0;
+      drawing = raw;
+    } catch { return json({ error: "Dessin invalide" }, 400); }
   } else {
     if (form.get("message")) return json({ error: "Une trace audio ne contient pas de texte" }, 400);
     const file = form.get("audio");
@@ -86,7 +102,7 @@ Deno.serve(async (req) => {
 
   const { data, error } = await db
     .from("traces")
-    .insert({ latitude: lat, longitude: lng, message, trace_type: type, audio_path: audioPath })
+    .insert({ latitude: lat, longitude: lng, message, trace_type: type, audio_path: audioPath, drawing })
     .select("id")
     .single();
   if (error) {

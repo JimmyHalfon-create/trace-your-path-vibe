@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data: t } = await db
     .from("traces")
-    .select("id, message, latitude, longitude, trace_type, audio_path, created_at")
+    .select("id, message, latitude, longitude, trace_type, audio_path, drawing, created_at")
     .eq("id", id)
     .maybeSingle();
   if (!t) return json({ error: "Trace introuvable" }, 404);
@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
     trace_type: t.trace_type,
     message: t.trace_type === "text" ? t.message : null,
     audio_url,
+    drawing: t.trace_type === "tag" ? t.drawing : null,
     created_at: t.created_at,
   });
 });

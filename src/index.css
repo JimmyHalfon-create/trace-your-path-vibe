@@ -201,3 +201,9 @@ All colors MUST be HSL.
   .splash-wave { display: none; }
   .splash { animation: splash-out 300ms ease-in 1500ms forwards; }
 }
+
+/* Tag pad: black ink on light paper, whatever the app theme */
+:root {
+  --tag-paper: 40 20% 94%;
+  --tag-ink: 0 0% 4%;
+}
