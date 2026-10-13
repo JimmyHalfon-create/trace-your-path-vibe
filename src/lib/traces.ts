@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 export type TraceType = "text" | "voice";
@@ -53,7 +54,7 @@ export const traceDistance = (user: LatLng, t: Trace) =>
   distanceMeters(user, { lat: t.latitude, lng: t.longitude });
 
 export const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", {
+  new Date(iso).toLocaleDateString(t.locale, {
     day: "numeric",
     month: "short",
     hour: "2-digit",

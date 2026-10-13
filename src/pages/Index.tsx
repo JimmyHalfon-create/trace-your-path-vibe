@@ -11,6 +11,7 @@ import TraceDetail from "@/components/TraceDetail";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useNearbyTraces, useTraces } from "@/hooks/useTraces";
 import OpeningSplash, { shouldShowSplash } from "@/components/OpeningSplash";
+import { t } from "@/lib/i18n";
 import { traceDistance, UNLOCK_RADIUS_METERS, type Trace } from "@/lib/traces";
 
 const Index = () => {
@@ -31,7 +32,7 @@ const Index = () => {
 
   const recenter = async () => {
     const pos = await refresh();
-    if (!pos) return toast.error(geoError ?? "Position introuvable");
+    if (!pos) return toast.error(geoError ?? t.positionNotFound);
     mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 15, duration: 1500 });
   };
 
@@ -45,7 +46,7 @@ const Index = () => {
     <div className="fixed inset-0 overflow-hidden bg-background">
       {splash && <OpeningSplash onDone={() => setSplash(false)} />}
       {!splash && !mapReady && (
-        <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center" role="status" aria-label="Chargement de la carte">
+        <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center" role="status" aria-label={t.loadingMap}>
           <Loader2 className="h-5 w-5 animate-spin text-primary/70" />
         </div>
       )}
@@ -70,7 +71,7 @@ const Index = () => {
         !position && (
           <Card className="absolute inset-x-4 top-20 z-30 flex items-center gap-3 bg-card/80 p-3 text-sm text-muted-foreground backdrop-blur">
             <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
-            <span>Recherche de votre position…</span>
+            <span>{t.searchingPosition}</span>
           </Card>
         )
       )}
@@ -85,10 +86,10 @@ const Index = () => {
         {nearby.length > 0 && (
           <Card className="flex items-center gap-2 border-primary/50 bg-primary/15 px-3 py-1.5 text-sm backdrop-blur">
             <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-primary" />
-            <span className="text-primary">{nearby.length} proche{nearby.length > 1 ? "s" : ""}</span>
+            <span className="text-primary">{t.nearby(nearby.length)}</span>
           </Card>
         )}
-        <Button size="icon" variant="secondary" onClick={recenter} aria-label="Ma position" className="bg-card/80 backdrop-blur">
+        <Button size="icon" variant="secondary" onClick={recenter} aria-label={t.myPosition} className="bg-card/80 backdrop-blur">
           <Navigation className="h-4 w-4" />
         </Button>
       </div>
@@ -107,7 +108,7 @@ const Index = () => {
           />
         ) : (
           <Button size="lg" className="h-14 w-full text-lg font-semibold shadow-lg" onClick={() => setComposing(true)}>
-            <Plus className="mr-2 h-6 w-6" /> Laisser une Trace
+            <Plus className="mr-2 h-6 w-6" /> {t.leaveTrace}
           </Button>
         )}
       </div>

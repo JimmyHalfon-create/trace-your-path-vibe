@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { t } from "@/lib/i18n";
 import { AlertTriangle } from 'lucide-react';
 
 interface Props {
@@ -33,13 +34,13 @@ class ErrorBoundary extends Component<Props, State> {
             <AlertTriangle className="w-16 h-16 text-destructive mx-auto" />
             <h1 className="text-2xl font-bold text-foreground">TRACE</h1>
             <div className="space-y-2">
-              <p className="text-destructive font-medium">Erreur de l'application</p>
+              <p className="text-destructive font-medium">{t.appError}</p>
               <p className="text-sm text-muted-foreground">
-                L'app a rencontré un problème. Veuillez la redémarrer.
+                {t.appErrorBody}
               </p>
               {this.state.error && (
                 <details className="text-xs text-left mt-4">
-                  <summary className="cursor-pointer">Détails techniques</summary>
+                  <summary className="cursor-pointer">{t.techDetails}</summary>
                   <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
                     {this.state.error.message}
                   </pre>
