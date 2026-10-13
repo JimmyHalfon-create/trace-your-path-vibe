@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut, Shield, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, LogOut, Shield, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { deleteTrace, fetchAdminTraces, formatDate, type AdminTrace as Trace } from "@/lib/traces";
+import { deleteTrace, fetchAdminTraces, formatDate, moderatePendingTraces, type AdminTrace as Trace } from "@/lib/traces";
 
 const Admin = () => {
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
   const [traces, setTraces] = useState<Trace[]>([]);
   const [loading, setLoading] = useState(true);
+  const [analysing, setAnalysing] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) return;
-    fetchAdminTraces()
-      .then(setTraces)
+    const load = () => fetchAdminTraces().then(setTraces);
+    load()
       .catch(() => toast.error("Impossible de charger les traces"))
       .finally(() => setLoading(false));
+    setAnalysing(true);
+    moderatePendingTraces()
+      .then((n) => (n > 0 ? load() : undefined))
+      .catch((e: Error) => toast.error(e.message))
+      .finally(() => setAnalysing(false));
   }, [isAdmin]);
 
   if (isAdmin === null) {
@@ -49,10 +55,12 @@ const Admin = () => {
   };
 
   const voiceCount = traces.filter((t) => t.trace_type === "voice").length;
+  const flaggedCount = traces.filter((t) => t.moderation_flag).length;
   const stats = [
     { label: "Total", value: traces.length },
     { label: "Texte", value: traces.length - voiceCount },
     { label: "Vocal", value: voiceCount },
+    { label: "Signalées", value: flaggedCount },
   ];
 
   return (
@@ -68,14 +76,20 @@ const Admin = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           {stats.map((s) => (
             <Card key={s.label} className="p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{s.value}</p>
+              <p className={`text-2xl font-bold ${s.label === "Signalées" && s.value ? "text-destructive" : "text-primary"}`}>{s.value}</p>
               <p className="text-xs text-muted-foreground">{s.label}</p>
             </Card>
           ))}
         </div>
+
+        {analysing && (
+          <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" /> Analyse IA des nouvelles traces…
+          </p>
+        )}
 
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">Chargement...</p>
@@ -83,12 +97,17 @@ const Admin = () => {
           <p className="py-8 text-center text-muted-foreground">Aucune trace</p>
         ) : (
           traces.map((t) => (
-            <Card key={t.id} className="flex items-start gap-3 p-4">
+            <Card key={t.id} className={`flex items-start gap-3 p-4 ${t.moderation_flag ? "border-destructive/60 bg-destructive/5" : ""}`}>
               <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded bg-primary/15 px-2 py-0.5 font-medium text-primary">
                     {t.trace_type === "voice" ? "Vocal" : "Texte"}
                   </span>
+                  {t.moderation_flag && (
+                    <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
+                      <AlertTriangle className="h-3 w-3" /> {t.moderation_reason ?? "Signalée"}
+                    </span>
+                  )}
                   <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
                 </div>
                 {t.trace_type === "voice" && t.audio_url ? (
