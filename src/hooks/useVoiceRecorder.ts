@@ -35,7 +35,7 @@ export function useVoiceRecorder() {
       audio: { echoCancellation: true, noiseSuppression: true },
     });
     const mimeType = pickMimeType();
-    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    const recorder = new MediaRecorder(stream, { ...(mimeType ? { mimeType } : {}), audioBitsPerSecond: 64000 });
     const chunks: BlobPart[] = [];
     recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
     recorder.onstop = () => {

@@ -24,7 +24,7 @@ export async function notifyTraceNearby(trace: Trace) {
           body:
             trace.trace_type === "voice"
               ? "Un message vocal vous attend ici"
-              : `"${trace.message.slice(0, 50)}"`,
+              : "Un message vous attend ici",
           extra: { traceId: trace.id },
         },
       ],

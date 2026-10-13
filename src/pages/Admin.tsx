@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { deleteTrace, fetchTraces, formatDate, type Trace } from "@/lib/traces";
+import { deleteTrace, fetchAdminTraces, formatDate, type AdminTrace as Trace } from "@/lib/traces";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!isAdmin) return;
-    fetchTraces()
+    fetchAdminTraces()
       .then(setTraces)
       .catch(() => toast.error("Impossible de charger les traces"))
       .finally(() => setLoading(false));
