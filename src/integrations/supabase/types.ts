@@ -36,6 +36,7 @@ export type Database = {
         Row: {
           audio_path: string | null
           created_at: string
+          drawing: Json | null
           id: string
           latitude: number
           longitude: number
@@ -49,6 +50,7 @@ export type Database = {
         Insert: {
           audio_path?: string | null
           created_at?: string
+          drawing?: Json | null
           id?: string
           latitude: number
           longitude: number
@@ -62,6 +64,7 @@ export type Database = {
         Update: {
           audio_path?: string | null
           created_at?: string
+          drawing?: Json | null
           id?: string
           latitude?: number
           longitude?: number
