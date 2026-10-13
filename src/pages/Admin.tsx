@@ -1,3 +1,4 @@
+import TagView from "@/components/TagView";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { AlertTriangle, ArrowLeft, LogOut, Shield, Sparkles, Trash2 } from "lucide-react";
@@ -55,10 +56,12 @@ const Admin = () => {
   };
 
   const voiceCount = traces.filter((t) => t.trace_type === "voice").length;
+  const tagCount = traces.filter((t) => t.trace_type === "tag").length;
   const flaggedCount = traces.filter((t) => t.moderation_flag).length;
   const stats = [
     { label: "Total", value: traces.length },
-    { label: "Texte", value: traces.length - voiceCount },
+    { label: "Texte", value: traces.length - voiceCount - tagCount },
+    { label: "Tag", value: tagCount },
     { label: "Vocal", value: voiceCount },
     { label: "Signalées", value: flaggedCount },
   ];
@@ -76,7 +79,7 @@ const Admin = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-5 gap-2">
           {stats.map((s) => (
             <Card key={s.label} className="p-3 text-center">
               <p className={`text-2xl font-bold ${s.label === "Signalées" && s.value ? "text-destructive" : "text-primary"}`}>{s.value}</p>
@@ -101,7 +104,7 @@ const Admin = () => {
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded bg-primary/15 px-2 py-0.5 font-medium text-primary">
-                    {t.trace_type === "voice" ? "Vocal" : "Texte"}
+                    {t.trace_type === "voice" ? "Vocal" : t.trace_type === "tag" ? "Tag" : "Texte"}
                   </span>
                   {t.moderation_flag && (
                     <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
@@ -110,7 +113,9 @@ const Admin = () => {
                   )}
                   <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
                 </div>
-                {t.trace_type === "voice" && t.audio_url ? (
+                {t.trace_type === "tag" && t.drawing ? (
+                  <TagView drawing={t.drawing} className="w-32" />
+                ) : t.trace_type === "voice" && t.audio_url ? (
                   <>
                     <AudioPlayer src={t.audio_url} />
                     {t.transcript ? (

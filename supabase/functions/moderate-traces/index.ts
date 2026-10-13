@@ -133,9 +133,11 @@ Deno.serve(async (req) => {
   if (!rows?.length) return json({ analysed: 0, remaining: false });
 
   const now = new Date().toISOString();
+  const tagIds = rows.filter((r) => r.trace_type === "tag").map((r) => r.id);
+  if (tagIds.length) await db.from("traces").update({ moderated_at: now, moderation_flag: false }).in("id", tagIds);
   // Voice traces: transcribe first, then moderate the transcript like text.
   const voiceItems: { id: string; message: string }[] = [];
-  for (const r of rows.filter((r) => r.trace_type !== "text")) {
+  for (const r of rows.filter((r) => r.trace_type === "voice")) {
     let transcript: string | null = null;
     if (r.audio_path) {
       const { data: file } = await db.storage.from("voice-traces").download(r.audio_path);
