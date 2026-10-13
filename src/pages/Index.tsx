@@ -10,13 +10,16 @@ import TraceComposer from "@/components/TraceComposer";
 import TraceDetail from "@/components/TraceDetail";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useNearbyTraces, useTraces } from "@/hooks/useTraces";
+import OpeningSplash, { shouldShowSplash } from "@/components/OpeningSplash";
 import { traceDistance, UNLOCK_RADIUS_METERS, type Trace } from "@/lib/traces";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { position, error: geoError, refresh } = useGeolocation();
+  const [splash, setSplash] = useState(shouldShowSplash);
+  const [mapReady, setMapReady] = useState(false);
+  const { position, error: geoError, refresh } = useGeolocation(!splash);
   const { traces, loading, reload } = useTraces();
-  const nearby = useNearbyTraces(position, traces);
+  const nearby = useNearbyTraces(position, traces, !splash);
   const [composing, setComposing] = useState(false);
   const [selected, setSelected] = useState<Trace | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -32,10 +35,20 @@ const Index = () => {
     mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 15, duration: 1500 });
   };
 
-  const onReady = useCallback((m: mapboxgl.Map) => (mapRef.current = m), []);
+  const onReady = useCallback((m: mapboxgl.Map) => {
+    mapRef.current = m;
+    if (m.loaded()) setMapReady(true);
+    else m.once("load", () => setMapReady(true));
+  }, []);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-background">
+      {splash && <OpeningSplash onDone={() => setSplash(false)} />}
+      {!splash && !mapReady && (
+        <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center" role="status" aria-label="Chargement de la carte">
+          <Loader2 className="h-5 w-5 animate-spin text-primary/70" />
+        </div>
+      )}
       <TraceMap user={position} traces={traces} isUnlocked={isUnlocked} onSelect={setSelected} onReady={onReady} />
 
       {/* Header */}

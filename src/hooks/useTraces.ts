@@ -25,12 +25,12 @@ export function useTraces() {
 }
 
 /** Traces within unlock radius + one-time local notification per trace. */
-export function useNearbyTraces(position: LatLng | null, traces: Trace[]) {
+export function useNearbyTraces(position: LatLng | null, traces: Trace[], enabled = true) {
   const notified = useRef(new Set<string>());
 
   useEffect(() => {
-    requestNotificationPermission();
-  }, []);
+    if (enabled) requestNotificationPermission();
+  }, [enabled]);
 
   const nearby = useMemo(
     () => (position ? traces.filter((t) => traceDistance(position, t) <= UNLOCK_RADIUS_METERS) : []),

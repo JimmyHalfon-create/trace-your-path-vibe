@@ -7,7 +7,9 @@ const config: CapacitorConfig = {
   plugins: {
     LocalNotifications: { iconColor: '#fbbf24' },
   },
-  ios: { backgroundColor: '#000000' },
+  ios: { backgroundColor: '#111317' },
+  android: { backgroundColor: '#111317' },
+  backgroundColor: '#111317',
 };
 
 export default config;
