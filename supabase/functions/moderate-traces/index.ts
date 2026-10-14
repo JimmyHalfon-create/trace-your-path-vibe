@@ -27,7 +27,7 @@ const SCHEMA = {
   },
 };
 
-const INSTRUCTIONS = `Tu es modérateur pour TRACE, une app de courts messages anonymes déposés dans des lieux.
+const INSTRUCTIONS = `Tu es modérateur pour TraceOn, une app de courts messages anonymes déposés dans des lieux.
 Pour chaque message, indique offensive=true s'il contient : insulte, harcèlement, menace, haine/discrimination, contenu sexuel explicite, incitation à la violence, données personnelles d'un tiers (nom complet, téléphone, adresse), ou spam/arnaque. Messages dans n'importe quelle langue, argot et fautes inclus.
 Ne signale pas un simple langage familier sans cible ni une opinion polie.
 reason : quelques mots en français si offensive=true (ex. "Insulte", "Menace"), sinon null. Réponds pour chaque id reçu.`;

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>TRACE</string>
+        <string>TraceOn</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,9 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>TRACE enregistre vos messages vocaux de 8 secondes.</string>
+	<string>TraceOn enregistre vos messages vocaux de 8 secondes.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TRACE affiche les traces autour de vous et vous prévient quand vous en croisez une.</string>
+	<string>TraceOn affiche les traces autour de vous et vous prévient quand vous en croisez une.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
