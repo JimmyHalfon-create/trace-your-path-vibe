@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* TRACE - Urban & mysterious theme */
+    /* TraceOn - Urban & mysterious theme */
     --background: 220 15% 8%;
     --foreground: 0 0% 95%;
 
@@ -57,7 +57,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* TRACE - Enhanced dark theme */
+    /* TraceOn - Enhanced dark theme */
     --background: 220 15% 5%;
     --foreground: 0 0% 98%;
 

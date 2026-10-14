@@ -1,4 +1,4 @@
-# TRACE — messages anonymes géolocalisés
+# TraceOn — messages anonymes géolocalisés
 
 ## Project info
 

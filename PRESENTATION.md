@@ -1,8 +1,8 @@
-# TRACE - Dossier de Présentation
+# TraceOn - Dossier de Présentation
 
 ## 📍 Concept
 
-**TRACE** est une application mobile innovante qui permet aux utilisateurs de laisser des messages géolocalisés anonymes partout dans le monde. Chaque "trace" est une empreinte digitale éphémère laissée à un endroit précis, accessible uniquement par les personnes physiquement présentes à proximité.
+**TraceOn** est une application mobile innovante qui permet aux utilisateurs de laisser des messages géolocalisés anonymes partout dans le monde. Chaque "trace" est une empreinte digitale éphémère laissée à un endroit précis, accessible uniquement par les personnes physiquement présentes à proximité.
 
 ---
 
@@ -209,13 +209,13 @@ Transformer le monde en une toile narrative interactive où chaque lieu raconte 
 
 ---
 
-## 💡 Pourquoi TRACE ?
+## 💡 Pourquoi TraceOn ?
 
-Dans un monde hyper-connecté mais paradoxalement déconnecté du territoire, **TRACE** propose une expérience unique : celle de lier le digital au physique, l'éphémère au permanent, l'anonymat à l'authenticité.
+Dans un monde hyper-connecté mais paradoxalement déconnecté du territoire, **TraceOn** propose une expérience unique : celle de lier le digital au physique, l'éphémère au permanent, l'anonymat à l'authenticité.
 
 Chaque trace est une bouteille à la mer moderne, un graffiti numérique respectueux, une preuve de passage qui ne laisse aucune empreinte carbone mais une empreinte émotionnelle.
 
-**TRACE** n'est pas un réseau social. C'est une carte du monde des émotions humaines.
+**TraceOn** n'est pas un réseau social. C'est une carte du monde des émotions humaines.
 
 ---
 
