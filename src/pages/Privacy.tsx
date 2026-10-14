@@ -5,6 +5,7 @@ import { ArrowLeft, Shield } from "lucide-react";
 // (same rule as src/lib/i18n.ts).
 const fr = {
   title: "Politique de confidentialité",
+  back: "Retour",
   updated: "Dernière mise à jour : 14 octobre 2026",
   intro: "TraceOn vous permet de laisser des messages anonymes à un endroit précis : un texte, un vocal ou un dessin (Tag). Les messages ne peuvent être lus qu'à moins de 50 mètres de l'endroit où ils ont été déposés.",
   sections: [
@@ -43,8 +44,9 @@ const fr = {
   ],
 };
 
-const en: Omit<typeof fr, "updated"> & { updated: string } = {
+const en: typeof fr = {
   title: "Privacy Policy",
+  back: "Back",
   updated: "Last updated: October 14, 2026",
   intro: "TraceOn lets you leave anonymous messages at a specific spot: a text, a voice recording, or a drawing (Tag). Messages can only be read within 50 metres of where they were left.",
   sections: [
@@ -91,7 +93,7 @@ const Privacy = () => {
       <div className="mx-auto max-w-2xl px-4 py-10">
         <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
-          {c.lang("fr") ?? ""}
+          {c.back}
         </Link>
 
         <div className="mb-8 flex items-center gap-3">
