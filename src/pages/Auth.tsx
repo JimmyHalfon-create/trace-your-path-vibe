@@ -62,6 +62,9 @@ const Auth = () => {
           </form>
         )}
       </Card>
+      <Link to="/privacy" className="absolute bottom-6 text-xs text-muted-foreground underline-offset-2 hover:underline">
+        Politique de confidentialité
+      </Link>
     </div>
   );
 };
