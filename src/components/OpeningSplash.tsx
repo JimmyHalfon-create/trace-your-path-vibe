@@ -38,7 +38,7 @@ const OpeningSplash = ({ onDone }: { onDone: () => void }) => {
           />
         </svg>
       </div>
-      <h1 className="splash-title mt-5 text-4xl font-bold tracking-widest text-primary">TRACE</h1>
+      <h1 className="splash-title mt-5 text-4xl font-bold tracking-widest text-primary">TraceOn</h1>
       <p className="splash-tagline mt-3 text-center text-sm text-foreground/85">{t.tagline}</p>
     </div>
   );

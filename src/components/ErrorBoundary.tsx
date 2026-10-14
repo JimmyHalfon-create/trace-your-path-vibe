@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <Card className="p-6 max-w-md w-full text-center space-y-4">
             <AlertTriangle className="w-16 h-16 text-destructive mx-auto" />
-            <h1 className="text-2xl font-bold text-foreground">TRACE</h1>
+            <h1 className="text-2xl font-bold text-foreground">TraceOn</h1>
             <div className="space-y-2">
               <p className="text-destructive font-medium">{t.appError}</p>
               <p className="text-sm text-muted-foreground">
