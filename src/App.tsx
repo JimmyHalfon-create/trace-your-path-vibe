@@ -4,6 +4,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -13,6 +14,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

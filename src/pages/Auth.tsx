@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm space-y-6 p-8">
         <div className="space-y-2 text-center">
           <Shield className="mx-auto h-12 w-12 text-primary" />
@@ -62,6 +62,9 @@ const Auth = () => {
           </form>
         )}
       </Card>
+      <Link to="/privacy" className="absolute bottom-6 text-xs text-muted-foreground underline-offset-2 hover:underline">
+        Politique de confidentialité
+      </Link>
     </div>
   );
 };
