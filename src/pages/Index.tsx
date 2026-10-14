@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type mapboxgl from "mapbox-gl";
 import { Loader2, MapPinOff, MessageSquare, Navigation, Plus, Shield } from "lucide-react";
 import { toast } from "sonner";
@@ -107,9 +107,16 @@ const Index = () => {
             onClose={() => setSelected(null)}
           />
         ) : (
-          <Button size="lg" className="h-14 w-full text-lg font-semibold shadow-lg" onClick={() => setComposing(true)}>
-            <Plus className="mr-2 h-6 w-6" /> {t.leaveTrace}
-          </Button>
+          <div className="space-y-2">
+            <Button size="lg" className="h-14 w-full text-lg font-semibold shadow-lg" onClick={() => setComposing(true)}>
+              <Plus className="mr-2 h-6 w-6" /> {t.leaveTrace}
+            </Button>
+            <p className="text-center">
+              <Link to="/privacy" className="text-xs text-muted-foreground underline-offset-2 hover:underline">
+                {t.privacy}
+              </Link>
+            </p>
+          </div>
         )}
       </div>
     </div>
