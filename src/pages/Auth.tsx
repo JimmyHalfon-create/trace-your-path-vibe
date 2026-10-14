@@ -43,7 +43,7 @@ const Auth = () => {
       <Card className="w-full max-w-sm space-y-6 p-8">
         <div className="space-y-2 text-center">
           <Shield className="mx-auto h-12 w-12 text-primary" />
-          <h1 className="text-2xl font-bold tracking-widest text-primary">TRACE</h1>
+          <h1 className="text-2xl font-bold tracking-widest text-primary">TraceOn</h1>
           <p className="text-sm text-muted-foreground">Accès administrateur</p>
         </div>
         {sent ? (

@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.jimmy.traceyourpath',
-  appName: 'TRACE',
+  appName: 'TraceOn',
   webDir: 'dist',
   plugins: {
     LocalNotifications: { iconColor: '#fbbf24' },

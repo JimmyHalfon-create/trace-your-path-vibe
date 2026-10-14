@@ -56,7 +56,7 @@ const Index = () => {
       <header className="safe-top absolute inset-x-4 z-10 flex items-center justify-between">
         <span className="w-9" />
         <Card className="bg-card/80 px-5 py-2 backdrop-blur">
-          <h1 className="text-xl font-bold tracking-widest text-primary">TRACE</h1>
+          <h1 className="text-xl font-bold tracking-widest text-primary">TraceOn</h1>
         </Card>
         <span className="w-9" />
       </header>
