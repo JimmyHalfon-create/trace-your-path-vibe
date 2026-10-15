@@ -39,7 +39,7 @@ const fr = {
     },
     {
       h: "Contact",
-      p: "Pour toute question sur vos données : contact via l'App Store ou l'email utilisé pour la publication de l'application.",
+      p: "Pour toute question sur vos données : support@trace-on.app",
     },
   ],
 };
@@ -80,7 +80,7 @@ const en: typeof fr = {
     },
     {
       h: "Contact",
-      p: "For any question about your data: contact via the App Store or the email used to publish the application.",
+      p: "For any question about your data: support@trace-on.app",
     },
   ],
 };

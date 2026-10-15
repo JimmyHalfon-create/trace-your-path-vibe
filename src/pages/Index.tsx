@@ -11,16 +11,18 @@ import TraceDetail from "@/components/TraceDetail";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useNearbyTraces, useTraces } from "@/hooks/useTraces";
 import OpeningSplash, { shouldShowSplash } from "@/components/OpeningSplash";
-import { t } from "@/lib/i18n";
+import { CONTACT_EMAIL, t } from "@/lib/i18n";
+import TermsGate, { termsAccepted } from "@/components/TermsGate";
 import { traceDistance, UNLOCK_RADIUS_METERS, type Trace } from "@/lib/traces";
 
 const Index = () => {
   const navigate = useNavigate();
   const [splash, setSplash] = useState(shouldShowSplash);
+  const [terms, setTerms] = useState(!termsAccepted());
   const [mapReady, setMapReady] = useState(false);
-  const { position, error: geoError, refresh } = useGeolocation(!splash);
-  const { traces, loading, reload } = useTraces();
-  const nearby = useNearbyTraces(position, traces, !splash);
+  const { position, error: geoError, refresh } = useGeolocation(!splash && !terms);
+  const { traces, loading, reload, remove } = useTraces();
+  const nearby = useNearbyTraces(position, traces, !splash && !terms);
   const [composing, setComposing] = useState(false);
   const [selected, setSelected] = useState<Trace | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -45,6 +47,7 @@ const Index = () => {
   return (
     <div className="fixed inset-0 overflow-hidden bg-background">
       {splash && <OpeningSplash onDone={() => setSplash(false)} />}
+      {!splash && terms && <TermsGate onAccept={() => setTerms(false)} onClose={termsAccepted() ? () => setTerms(false) : undefined} />}
       {!splash && !mapReady && (
         <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center" role="status" aria-label={t.loadingMap}>
           <Loader2 className="h-5 w-5 animate-spin text-primary/70" />
@@ -105,6 +108,7 @@ const Index = () => {
             distance={position ? traceDistance(position, selected) : null}
             position={position}
             onClose={() => setSelected(null)}
+            onRemoved={remove}
           />
         ) : (
           <div className="space-y-2">
@@ -115,6 +119,10 @@ const Index = () => {
               <Link to="/privacy" className="text-xs text-muted-foreground underline-offset-2 hover:underline">
                 {t.privacy}
               </Link>
+              <span className="mx-2 text-xs text-muted-foreground">·</span>
+              <button onClick={() => setTerms(true)} className="text-xs text-muted-foreground underline-offset-2 hover:underline">{t.termsLink}</button>
+              <span className="mx-2 text-xs text-muted-foreground">·</span>
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-xs text-muted-foreground underline-offset-2 hover:underline">{t.contact}</a>
             </p>
           </div>
         )}

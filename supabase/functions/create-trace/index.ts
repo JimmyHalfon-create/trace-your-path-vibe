@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { moderate } from "../_shared/moderation.ts";
 import { audioDuration, sniffKind } from "./audio.ts";
 
 const MAX_TEXT = 70;
@@ -46,6 +47,11 @@ Deno.serve(async (req) => {
   // ---- Parse & validate ----
   let form: FormData;
   try { form = await req.formData(); } catch { return json({ error: "Requête invalide" }, 400); }
+  const device = String(form.get("device") ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(device)) return json({ error: "Appareil invalide" }, 400);
+  const authorKey = await hashIp(`device:${device}`);
+  const { data: banned } = await db.from("banned_authors").select("author_key").eq("author_key", authorKey).maybeSingle();
+  if (banned) return json({ error: "Compte bloqué pour non-respect des règles." }, 403);
   const type = form.get("type");
   const lat = Number(form.get("lat"));
   const lng = Number(form.get("lng"));
@@ -98,11 +104,27 @@ Deno.serve(async (req) => {
     if (error) return json({ error: "Envoi audio impossible" }, 500);
   }
 
+  // Objectionable-content filter: flagged text is hidden until an admin reviews it.
+  let moderation: Record<string, unknown> = {};
+  const apiKey = Deno.env.get("LOVABLE_API_KEY");
+  if (type === "text" && apiKey) {
+    const out = await moderate(apiKey, [{ id: "new", message }]);
+    if (!("error" in out)) {
+      const r = out.results[0];
+      moderation = {
+        moderated_at: new Date().toISOString(),
+        moderation_flag: !!r?.offensive,
+        moderation_reason: r?.offensive ? (r.reason ?? "Contenu signalé").slice(0, 80) : null,
+        hidden: !!r?.offensive,
+      };
+    }
+  }
+
   await db.from("trace_rate_limits").insert({ ip_hash: ipHash });
 
   const { data, error } = await db
     .from("traces")
-    .insert({ latitude: lat, longitude: lng, message, trace_type: type, audio_path: audioPath, drawing })
+    .insert({ latitude: lat, longitude: lng, message, trace_type: type, audio_path: audioPath, drawing, author_key: authorKey, ...moderation })
     .select("id")
     .single();
   if (error) {

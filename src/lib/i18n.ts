@@ -43,6 +43,23 @@ const fr = {
   appError: "Erreur de l'application",
   appErrorBody: "L'app a rencontré un problème. Veuillez la redémarrer.",
   techDetails: "Détails techniques",
+  report: "Signaler",
+  hide: "Masquer",
+  block: "Bloquer l'auteur",
+  reported: "Merci, la trace est signalée et masquée. Nous la vérifions sous 24 h.",
+  hidden: "Trace masquée",
+  blocked: "Auteur bloqué : vous ne verrez plus ses traces",
+  blockConfirm: "Bloquer cet auteur ? Vous ne verrez plus aucune de ses traces.",
+  contact: "Contact / signaler un abus",
+  termsTitle: "Règles d'utilisation",
+  termsBody: [
+    "TraceOn est réservé aux personnes de 18 ans et plus.",
+    "Tolérance zéro : aucun contenu insultant, haineux, menaçant, sexuel, violent, illégal ou visant une personne n'est accepté.",
+    "Les contenus sont filtrés automatiquement. Chacun peut signaler, masquer une trace ou bloquer son auteur.",
+    "Les signalements sont traités sous 24 h : le contenu est supprimé et l'auteur exclu de l'app.",
+  ],
+  termsAccept: "J'ai 18 ans ou plus et j'accepte les règles",
+  termsLink: "Conditions",
 };
 
 const en: typeof fr = {
@@ -88,7 +105,26 @@ const en: typeof fr = {
   appError: "App error",
   appErrorBody: "The app ran into a problem. Please restart it.",
   techDetails: "Technical details",
+  report: "Report",
+  hide: "Hide",
+  block: "Block author",
+  reported: "Thanks, the trace is reported and hidden. We review reports within 24 h.",
+  hidden: "Trace hidden",
+  blocked: "Author blocked: you won't see their traces anymore",
+  blockConfirm: "Block this author? You won't see any of their traces.",
+  contact: "Contact / report abuse",
+  termsTitle: "Terms of use",
+  termsBody: [
+    "TraceOn is for people aged 18 and over.",
+    "Zero tolerance: no insulting, hateful, threatening, sexual, violent, illegal or targeting content, and no abusive users.",
+    "Content is filtered automatically. Anyone can report or hide a trace, or block its author.",
+    "Reports are handled within 24 h: the content is removed and the author is ejected from the app.",
+  ],
+  termsAccept: "I am 18+ and I accept the terms",
+  termsLink: "Terms",
 };
+
+export const CONTACT_EMAIL = "support@trace-on.app";
 
 const lang = (typeof navigator !== "undefined" ? navigator.language : "en").toLowerCase();
 export const isFrench = lang.startsWith("fr");

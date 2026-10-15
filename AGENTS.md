@@ -13,3 +13,4 @@
 - AI moderation runs only in the admin-only `moderate-traces` edge function (verdict stored on `traces`, `moderated_at` marks analysed rows); the admin page triggers it on load and sorts flagged traces first — no AI key or prompt in the client.
 - Tag traces store the drawing as validated integer stroke JSON (`drawing` column) rendered as SVG, never as an uploaded image — nothing executable or unscanned reaches storage.
 - The map app (`Index`) renders only when `Capacitor.isNativePlatform()`; the web `/` shows the `Landing` presentation page — the app must not be usable from the public website.
+- UGC safety (Apple 1.2): terms gate before map use; text is AI-filtered in `create-trace` (flagged → `hidden`); reports go through `report-trace` (auto-hide at 2); per-device hide/block lists are local; admins can restore or ban an author (`banned_authors`, keyed by salted device hash) — keep all four in place for App Store review.

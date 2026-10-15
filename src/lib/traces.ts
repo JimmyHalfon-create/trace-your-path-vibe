@@ -14,6 +14,8 @@ export interface Trace {
   longitude: number;
   created_at: string;
   trace_type: TraceType;
+  /** Opaque author fingerprint, used only for local blocking. */
+  author: string;
 }
 
 /** Content, delivered by the server only within the unlock radius. */
@@ -27,7 +29,7 @@ export interface TraceContent {
 }
 
 /** Admin view (full row + signed audio URL + AI moderation verdict). */
-export interface AdminTrace extends Trace {
+export interface AdminTrace extends Omit<Trace, "author"> {
   message: string;
   audio_path: string | null;
   drawing: TagDrawing | null;
@@ -36,6 +38,9 @@ export interface AdminTrace extends Trace {
   moderation_reason: string | null;
   moderated_at: string | null;
   transcript: string | null;
+  hidden: boolean;
+  author_key: string | null;
+  report_count: number;
 }
 
 /** Runs AI moderation on not-yet-analysed traces (admin only). Loops over batches. */
@@ -112,6 +117,7 @@ export async function createTrace(
 ): Promise<void> {
   const form = new FormData();
   form.append("type", input.type);
+  form.append("device", deviceId());
   form.append("lat", String(position.lat));
   form.append("lng", String(position.lng));
   if (input.type === "text") form.append("message", input.message.trim().slice(0, MAX_TEXT_LENGTH));
@@ -143,7 +149,7 @@ export async function fetchAdminTraces(): Promise<AdminTrace[]> {
       audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
     }))
     // Flagged first, then newest (rows already sorted by date; sort is stable).
-    .sort((a, b) => Number(!!b.moderation_flag) - Number(!!a.moderation_flag));
+    .sort((a, b) => Number(!!b.moderation_flag || b.report_count > 0) - Number(!!a.moderation_flag || a.report_count > 0) || b.report_count - a.report_count);
 }
 
 export async function deleteTrace(trace: AdminTrace): Promise<void> {
@@ -155,4 +161,43 @@ export async function deleteTrace(trace: AdminTrace): Promise<void> {
   const { data, error } = await supabase.from("traces").delete().eq("id", trace.id).select("id");
   if (error) throw error;
   if (!data?.length) throw new Error("Suppression refusée");
+}
+
+export async function approveTrace(id: string): Promise<void> {
+  const { error } = await supabase.from("traces").update({ hidden: false, moderation_flag: false }).eq("id", id);
+  if (error) throw error;
+}
+
+/** Bans the author's device from posting and removes all their traces. */
+export async function banAuthor(trace: AdminTrace, all: AdminTrace[]): Promise<string[]> {
+  if (!trace.author_key) throw new Error("Auteur inconnu");
+  const { error } = await supabase.from("banned_authors").upsert({ author_key: trace.author_key });
+  if (error) throw error;
+  const theirs = all.filter((t) => t.author_key === trace.author_key);
+  for (const t of theirs) await deleteTrace(t);
+  return theirs.map((t) => t.id);
+}
+
+// ---------- Per-device safety (report / hide / block) ----------
+
+const read = (k: string): string[] => {
+  try { return JSON.parse(localStorage.getItem(k) ?? "[]"); } catch { return []; }
+};
+const add = (k: string, v: string) => localStorage.setItem(k, JSON.stringify([...new Set([...read(k), v])]));
+
+export function deviceId(): string {
+  let id = localStorage.getItem("traceon_device");
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem("traceon_device", id); }
+  return id;
+}
+export const hideTraceLocally = (id: string) => add("traceon_hidden", id);
+export const blockAuthorLocally = (author: string) => add("traceon_blocked", author);
+export function isFilteredLocally(t: Trace): boolean {
+  return read("traceon_hidden").includes(t.id) || read("traceon_blocked").includes(t.author);
+}
+
+export async function reportTrace(id: string): Promise<void> {
+  const { error } = await supabase.functions.invoke("report-trace", { body: { id, device: deviceId() } });
+  if (error) throw await functionError(error, "Signalement impossible");
+  hideTraceLocally(id);
 }
