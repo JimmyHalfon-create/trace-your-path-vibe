@@ -65,19 +65,6 @@ const TraceDetail = ({ trace, unlocked, distance, position, onClose, onRemoved }
           )}
           <p className="text-xs text-muted-foreground">{formatDate(trace.created_at)}</p>
         </>
-      )}
-      <div className="flex flex-wrap gap-1 border-t border-border pt-2">
-        <button className={action} onClick={report}><Flag className="h-3.5 w-3.5" /> {t.report}</button>
-        <button className={action} onClick={hide}><EyeOff className="h-3.5 w-3.5" /> {t.hide}</button>
-        <button className={action} onClick={block}><UserX className="h-3.5 w-3.5" /> {t.block}</button>
-      </div>
-    </Card>
-  );
-};
-const _unused = () => (
-    <>
-      {false ? (
-        <></>
       ) : (
         <div className="flex items-center gap-3 pr-6">
           <Lock className="h-5 w-5 text-primary" />
@@ -90,6 +77,11 @@ const _unused = () => (
           </div>
         </div>
       )}
+      <div className="flex flex-wrap gap-1 border-t border-border pt-2">
+        <button className={action} onClick={report}><Flag className="h-3.5 w-3.5" /> {t.report}</button>
+        <button className={action} onClick={hide}><EyeOff className="h-3.5 w-3.5" /> {t.hide}</button>
+        <button className={action} onClick={block}><UserX className="h-3.5 w-3.5" /> {t.block}</button>
+      </div>
     </Card>
   );
 };
