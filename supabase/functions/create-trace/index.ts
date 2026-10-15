@@ -47,9 +47,9 @@ Deno.serve(async (req) => {
   // ---- Parse & validate ----
   let form: FormData;
   try { form = await req.formData(); } catch { return json({ error: "Requête invalide" }, 400); }
-  const device = String(form.get("device") ?? "");
-  if (!/^[0-9a-f-]{36}$/.test(device)) return json({ error: "Appareil invalide" }, 400);
-  const authorKey = await hashIp(`device:${device}`);
+  const device = String(form.get("device") ?? "").toLowerCase();
+  // Older app builds don't send a device id: fall back to the IP hash so they keep working.
+  const authorKey = /^[0-9a-f-]{36}$/.test(device) ? await hashIp(`device:${device}`) : ipHash;
   const { data: banned } = await db.from("banned_authors").select("author_key").eq("author_key", authorKey).maybeSingle();
   if (banned) return json({ error: "Compte bloqué pour non-respect des règles." }, 403);
   const type = form.get("type");
