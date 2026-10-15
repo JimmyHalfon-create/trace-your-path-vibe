@@ -4,6 +4,7 @@
 - The public only gets marker data (`get_trace_markers` RPC); trace content and signed audio URLs come only from the `trace-content` edge function after a 50 m check, and new traces only through `create-trace` (validation, audio duration parsing, IP-hash rate limit) — direct table/bucket access is admin-only so the client cannot bypass the rules.
 - Trace grouping uses Mapbox GeoJSON clustering with a cutoff below the map's maximum zoom; close-zoom overlapping HTML markers use display offsets only — all traces become selectable without changing their GPS coordinates.
 - Trace details render in React cards, never in Mapbox HTML popups — avoids injecting user text as HTML and fixes overlay stacking on mobile.
+- TraceDetail uses two accessible flip faces for content and safety actions; audio controls and close never trigger flipping — keeps touch actions separate from playback.
 - Audio uses the custom `AudioPlayer` (no native `controls`) — native players render inconsistently in iOS/Android WebViews.
 - Capacitor config has no `server.url` — the native app must bundle local files, otherwise it opens the browser.
 - Native-only features (notifications) are guarded by `Capacitor.isNativePlatform()` — the same code runs on web.
