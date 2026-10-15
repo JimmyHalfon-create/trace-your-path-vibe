@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchTraces, traceDistance, UNLOCK_RADIUS_METERS, type LatLng, type Trace } from "@/lib/traces";
+import { fetchTraces, isFilteredLocally, traceDistance, UNLOCK_RADIUS_METERS, type LatLng, type Trace } from "@/lib/traces";
 import { notifyTraceNearby, requestNotificationPermission } from "@/lib/notifications";
 
 export function useTraces() {
@@ -9,7 +9,7 @@ export function useTraces() {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      setTraces(await fetchTraces());
+      setTraces((await fetchTraces()).filter((t) => !isFilteredLocally(t)));
     } catch (e) {
       console.error("Chargement des traces impossible", e);
     } finally {
@@ -21,7 +21,8 @@ export function useTraces() {
     reload();
   }, [reload]);
 
-  return { traces, loading, reload };
+  const remove = useCallback((pred: (t: Trace) => boolean) => setTraces((p) => p.filter((t) => !pred(t))), []);
+  return { traces, loading, reload, remove };
 }
 
 /** Traces within unlock radius + one-time local notification per trace. */
