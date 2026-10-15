@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      banned_authors: {
+        Row: {
+          author_key: string
+          created_at: string
+        }
+        Insert: {
+          author_key: string
+          created_at?: string
+        }
+        Update: {
+          author_key?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       trace_rate_limits: {
         Row: {
           created_at: string
@@ -32,11 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      trace_reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          reporter_key: string
+          trace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_key: string
+          trace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_key?: string
+          trace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trace_reports_trace_id_fkey"
+            columns: ["trace_id"]
+            isOneToOne: false
+            referencedRelation: "traces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traces: {
         Row: {
           audio_path: string | null
+          author_key: string | null
           created_at: string
           drawing: Json | null
+          hidden: boolean
           id: string
           latitude: number
           longitude: number
@@ -44,13 +93,16 @@ export type Database = {
           moderated_at: string | null
           moderation_flag: boolean | null
           moderation_reason: string | null
+          report_count: number
           trace_type: string
           transcript: string | null
         }
         Insert: {
           audio_path?: string | null
+          author_key?: string | null
           created_at?: string
           drawing?: Json | null
+          hidden?: boolean
           id?: string
           latitude: number
           longitude: number
@@ -58,13 +110,16 @@ export type Database = {
           moderated_at?: string | null
           moderation_flag?: boolean | null
           moderation_reason?: string | null
+          report_count?: number
           trace_type?: string
           transcript?: string | null
         }
         Update: {
           audio_path?: string | null
+          author_key?: string | null
           created_at?: string
           drawing?: Json | null
+          hidden?: boolean
           id?: string
           latitude?: number
           longitude?: number
@@ -72,6 +127,7 @@ export type Database = {
           moderated_at?: string | null
           moderation_flag?: boolean | null
           moderation_reason?: string | null
+          report_count?: number
           trace_type?: string
           transcript?: string | null
         }
@@ -106,6 +162,7 @@ export type Database = {
       get_trace_markers: {
         Args: never
         Returns: {
+          author: string
           created_at: string
           id: string
           latitude: number
