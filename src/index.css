@@ -203,6 +203,20 @@ All colors MUST be HSL.
 }
 
 /* Tag pad: black ink on light paper, whatever the app theme */
+.trace-flip { perspective: 1000px; }
+.trace-flip-inner { display: grid; transform-style: preserve-3d; transition: transform 350ms ease; }
+.trace-flip-inner.is-flipped { transform: rotateY(180deg); }
+.trace-flip-face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.trace-flip-back { transform: rotateY(180deg); }
+.trace-flip-front { visibility: visible; }
+.trace-flip-back { visibility: hidden; }
+.is-flipped .trace-flip-front { visibility: hidden; }
+.is-flipped .trace-flip-back { visibility: visible; }
+.trace-flip-face { transition: visibility 0s 175ms; }
+@media (prefers-reduced-motion: reduce) {
+  .trace-flip-inner, .trace-flip-face { transition: none; }
+}
+
 :root {
   --tag-paper: 40 20% 94%;
   --tag-ink: 0 0% 4%;
