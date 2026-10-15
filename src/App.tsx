@@ -10,7 +10,10 @@ import Landing from "./pages/Landing";
 import { Capacitor } from "@capacitor/core";
 
 // The map app only runs inside the native iOS/Android app; the web shows a presentation page.
-const isApp = Capacitor.isNativePlatform();
+// Local dev servers (localhost) also get the map so changes can be tested in a browser.
+const isApp =
+  Capacitor.isNativePlatform() ||
+  typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
 const App = () => (
   <ErrorBoundary>
