@@ -149,7 +149,7 @@ export async function fetchAdminTraces(): Promise<AdminTrace[]> {
       audio_url: r.audio_path ? urls.get(r.audio_path) ?? null : null,
     }))
     // Flagged first, then newest (rows already sorted by date; sort is stable).
-    .sort((a, b) => Number(!!b.moderation_flag) - Number(!!a.moderation_flag));
+    .sort((a, b) => Number(!!b.moderation_flag || b.report_count > 0) - Number(!!a.moderation_flag || a.report_count > 0) || b.report_count - a.report_count);
 }
 
 export async function deleteTrace(trace: AdminTrace): Promise<void> {

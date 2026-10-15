@@ -1,14 +1,14 @@
 import TagView from "@/components/TagView";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, LogOut, Shield, Sparkles, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, EyeOff, Flag, LogOut, Shield, Sparkles, Trash2, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { deleteTrace, fetchAdminTraces, formatDate, moderatePendingTraces, type AdminTrace as Trace } from "@/lib/traces";
+import { approveTrace, banAuthor, deleteTrace, fetchAdminTraces, formatDate, moderatePendingTraces, type AdminTrace as Trace } from "@/lib/traces";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -48,6 +48,22 @@ const Admin = () => {
     } catch {
       toast.error("Suppression impossible");
     }
+  };
+
+  const approve = async (t: Trace) => {
+    try {
+      await approveTrace(t.id);
+      setTraces((p) => p.map((x) => (x.id === t.id ? { ...x, hidden: false, moderation_flag: false } : x)));
+      toast.success("Trace rétablie");
+    } catch { toast.error("Action impossible"); }
+  };
+  const ban = async (t: Trace) => {
+    if (!confirm("Exclure cet auteur ? Toutes ses traces seront supprimées et il ne pourra plus publier.")) return;
+    try {
+      const ids = await banAuthor(t, traces);
+      setTraces((p) => p.filter((x) => !ids.includes(x.id)));
+      toast.success(`Auteur exclu, ${ids.length} trace(s) supprimée(s)`);
+    } catch (e) { toast.error((e as Error).message); }
   };
 
   const logout = async () => {
@@ -100,7 +116,7 @@ const Admin = () => {
           <p className="py-8 text-center text-muted-foreground">Aucune trace</p>
         ) : (
           traces.map((t) => (
-            <Card key={t.id} className={`flex items-start gap-3 p-4 ${t.moderation_flag ? "border-destructive/60 bg-destructive/5" : ""}`}>
+            <Card key={t.id} className={`flex items-start gap-3 p-4 ${t.moderation_flag || t.report_count > 0 ? "border-destructive/60 bg-destructive/5" : ""}`}>
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded bg-primary/15 px-2 py-0.5 font-medium text-primary">
@@ -109,6 +125,16 @@ const Admin = () => {
                   {t.moderation_flag && (
                     <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
                       <AlertTriangle className="h-3 w-3" /> {t.moderation_reason ?? "Signalée"}
+                    </span>
+                  )}
+                  {t.report_count > 0 && (
+                    <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
+                      <Flag className="h-3 w-3" /> {t.report_count} signalement(s)
+                    </span>
+                  )}
+                  {t.hidden && (
+                    <span className="flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-muted-foreground">
+                      <EyeOff className="h-3 w-3" /> Masquée
                     </span>
                   )}
                   <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
@@ -129,9 +155,21 @@ const Admin = () => {
                   {t.latitude.toFixed(4)}, {t.longitude.toFixed(4)}
                 </p>
               </div>
-              <Button variant="destructive" size="icon" onClick={() => remove(t)} aria-label="Supprimer">
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button variant="destructive" size="icon" onClick={() => remove(t)} aria-label="Supprimer">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                {t.author_key && (
+                  <Button variant="outline" size="icon" onClick={() => ban(t)} aria-label="Exclure l'auteur">
+                    <UserX className="h-4 w-4" />
+                  </Button>
+                )}
+                {t.hidden && (
+                  <Button variant="outline" size="icon" onClick={() => approve(t)} aria-label="Rétablir">
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </Card>
           ))
         )}
