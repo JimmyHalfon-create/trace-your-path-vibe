@@ -10,10 +10,15 @@ import Landing from "./pages/Landing";
 import { Capacitor } from "@capacitor/core";
 
 // The map app only runs inside the native iOS/Android app; the web shows a presentation page.
-// Local dev servers (localhost) also get the map so changes can be tested in a browser.
+// Local dev servers and the private Lovable editor preview also get the map for testing;
+// the published site and custom domain stay locked to the presentation page.
+const host = typeof window !== "undefined" ? window.location.hostname : "";
 const isApp =
   Capacitor.isNativePlatform() ||
-  typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  host === "localhost" ||
+  host === "127.0.0.1" ||
+  host.startsWith("id-preview--") ||
+  host.endsWith(".lovableproject.com");
 
 const App = () => (
   <ErrorBoundary>
