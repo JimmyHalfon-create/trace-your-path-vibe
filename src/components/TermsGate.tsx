@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CONTACT_EMAIL, t } from "@/lib/i18n";
 
-const KEY = "traceon_terms_v1";
+const KEY = "traceon_terms_v2";
 export const termsAccepted = () => localStorage.getItem(KEY) === "1";
 
 /** Terms (EULA) shown until accepted; reopenable from the map. */

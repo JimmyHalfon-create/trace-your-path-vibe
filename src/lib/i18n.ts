@@ -53,12 +53,12 @@ const fr = {
   contact: "Contact / signaler un abus",
   termsTitle: "Règles d'utilisation",
   termsBody: [
-    "TraceOn est réservé aux personnes de 18 ans et plus.",
+    "TraceOn est réservé aux personnes de 16 ans et plus.",
     "Tolérance zéro : aucun contenu insultant, haineux, menaçant, sexuel, violent, illégal ou visant une personne n'est accepté.",
     "Les contenus sont filtrés automatiquement. Chacun peut signaler, masquer une trace ou bloquer son auteur.",
     "Les signalements sont traités sous 24 h : le contenu est supprimé et l'auteur exclu de l'app.",
   ],
-  termsAccept: "J'ai 18 ans ou plus et j'accepte les règles",
+  termsAccept: "J'ai 16 ans ou plus et j'accepte les règles",
   termsLink: "Conditions",
 };
 
@@ -115,12 +115,12 @@ const en: typeof fr = {
   contact: "Contact / report abuse",
   termsTitle: "Terms of use",
   termsBody: [
-    "TraceOn is for people aged 18 and over.",
+    "TraceOn is for people aged 16 and over.",
     "Zero tolerance: no insulting, hateful, threatening, sexual, violent, illegal or targeting content, and no abusive users.",
     "Content is filtered automatically. Anyone can report or hide a trace, or block its author.",
     "Reports are handled within 24 h: the content is removed and the author is ejected from the app.",
   ],
-  termsAccept: "I am 18+ and I accept the terms",
+  termsAccept: "I am 16+ and I accept the terms",
   termsLink: "Terms",
 };
 
