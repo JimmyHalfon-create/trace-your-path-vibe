@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Mic, PenLine, Lock } from "lucide-react";
 import { isFrench } from "@/lib/i18n";
-import storeBadge from "@/assets/app-store-badge.png.asset.json";
 
 const copies = {
   fr: {
@@ -61,7 +60,7 @@ const Landing = () => {
         <p className="mt-4 text-xl text-foreground/90">{copy.tagline}</p>
         <p className="mt-6 max-w-xl text-muted-foreground">{copy.intro}</p>
         <img
-          src={storeBadge.url}
+          src="/app-store-badge.png"
           alt={copy.storeAlt}
           className="mt-10 h-auto w-52 max-w-full rounded-lg"
         />
