@@ -29,7 +29,7 @@ export interface TraceContent {
 }
 
 /** Admin view (full row + signed audio URL + AI moderation verdict). */
-export interface AdminTrace extends Trace {
+export interface AdminTrace extends Omit<Trace, "author"> {
   message: string;
   audio_path: string | null;
   drawing: TagDrawing | null;
