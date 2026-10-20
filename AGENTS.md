@@ -15,3 +15,4 @@
 - Tag traces store the drawing as validated integer stroke JSON (`drawing` column) rendered as SVG, never as an uploaded image — nothing executable or unscanned reaches storage.
 - The map app (`Index`) renders only on native, localhost, or the private Lovable editor preview host; the published site and custom domain show `Landing` — the app must not be usable from the public website.
 - UGC safety (Apple 1.2): terms gate before map use; text is AI-filtered in `create-trace` (flagged → `hidden`); reports go through `report-trace` (auto-hide at 2); per-device hide/block lists are local; admins can restore or ban an author (`banned_authors`, keyed by salted device hash) — keep all four in place for App Store review.
+- AppDelegate adopts the UIScene lifecycle (UIApplicationSceneManifest in Info.plist, scene delegate implemented on AppDelegate) — iOS 27 kills any app at launch without scene adoption, which crashed the App Store review.
