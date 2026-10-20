@@ -6,6 +6,24 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
         <string>TraceOn</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).AppDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>CFBundleExecutable</key>
