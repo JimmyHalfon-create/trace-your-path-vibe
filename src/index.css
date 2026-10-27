@@ -199,7 +199,7 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) {
   .splash-shield { stroke-dashoffset: 0; animation: none; }
   .splash-dot { opacity: 1; animation: none; }
-  .splash-wave { display: none; }
+  .splash-title, .splash-tagline { transform: none; animation: splash-fade 300ms ease-out forwards; }
   .splash { animation: splash-out 300ms ease-in 1500ms forwards; }
 }
 
