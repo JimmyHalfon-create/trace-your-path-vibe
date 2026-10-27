@@ -33,7 +33,10 @@ const Admin = () => {
   if (isAdmin === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Shield className="h-12 w-12 animate-pulse text-primary" />
+        <svg viewBox="0 0 100 100" className="h-12 w-12 animate-pulse" fill="none" aria-hidden="true">
+          <path d="M 81.9 43.4 A 34 34 0 1 1 55.9 21.5" className="stroke-primary" strokeWidth={14} />
+          <circle cx={74.2} cy={24.7} r={11.2} className="fill-primary" />
+        </svg>
       </div>
     );
   }

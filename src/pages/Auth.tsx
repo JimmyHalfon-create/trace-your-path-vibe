@@ -42,7 +42,10 @@ const Auth = () => {
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm space-y-6 p-8">
         <div className="space-y-2 text-center">
-          <Shield className="mx-auto h-12 w-12 text-primary" />
+          <svg viewBox="0 0 100 100" className="mx-auto h-12 w-12" fill="none" aria-hidden="true">
+            <path d="M 81.9 43.4 A 34 34 0 1 1 55.9 21.5" className="stroke-primary" strokeWidth={14} />
+            <circle cx={74.2} cy={24.7} r={11.2} className="fill-primary" />
+          </svg>
           <h1 className="text-2xl font-bold tracking-widest text-primary">TraceOn</h1>
           <p className="text-sm text-muted-foreground">Accès administrateur</p>
         </div>
