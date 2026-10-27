@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TraceOn</string>
+    <string name="title_activity_main">TraceOn</string>
+    <string name="package_name">com.jimmy.traceyourpath</string>
+    <string name="custom_url_scheme">com.jimmy.traceyourpath</string>
+</resources>
