@@ -1,7 +1,7 @@
 import TagView from "@/components/TagView";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, Check, EyeOff, Flag, LogOut, Shield, Sparkles, Trash2, UserX } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, EyeOff, Flag, LogOut, Sparkles, Trash2, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
