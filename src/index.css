@@ -200,6 +200,7 @@ All colors MUST be HSL.
   .splash-shield { stroke-dashoffset: 0; animation: none; }
   .splash-dot { opacity: 1; animation: none; }
   .splash-title, .splash-tagline { transform: none; animation: splash-fade 300ms ease-out forwards; }
+  .splash-wave { display: none; }
   .splash { animation: splash-out 300ms ease-in 1500ms forwards; }
 }
 
