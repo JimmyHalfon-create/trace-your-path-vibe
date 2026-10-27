@@ -14,6 +14,7 @@ const copies = {
       { icon: MapPin, title: "Anonyme", body: "Aucun compte, aucun nom, aucun suivi publicitaire." },
     ],
     storeAlt: "Télécharger TraceOn sur l'App Store",
+    playAlt: "Télécharger TraceOn sur Google Play",
     privacy: "Confidentialité",
   },
   en: {
@@ -26,6 +27,7 @@ const copies = {
       { icon: MapPin, title: "Anonymous", body: "No account, no name, no ad tracking." },
     ],
     storeAlt: "Download TraceOn on the App Store",
+    playAlt: "Download TraceOn on Google Play",
     privacy: "Privacy",
   },
 } as const;
@@ -59,11 +61,18 @@ const Landing = () => {
         <h1 className="mt-8 text-5xl font-bold tracking-widest text-primary">TraceOn</h1>
         <p className="mt-4 text-xl text-foreground/90">{copy.tagline}</p>
         <p className="mt-6 max-w-xl text-muted-foreground">{copy.intro}</p>
-        <img
-          src="/app-store-badge.png"
-          alt={copy.storeAlt}
-          className="mt-10 h-auto w-52 max-w-full rounded-lg"
-        />
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <img
+            src="/app-store-badge.png"
+            alt={copy.storeAlt}
+            className="h-auto w-44 max-w-full rounded-lg"
+          />
+          <img
+            src="/google-play-badge.png"
+            alt={copy.playAlt}
+            className="h-auto w-44 max-w-full rounded-lg"
+          />
+        </div>
       </section>
       <section className="mx-auto grid max-w-3xl gap-4 px-6 pb-16 sm:grid-cols-2">
         {copy.features.map(({ icon: Icon, title, body }) => (
