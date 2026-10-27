@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'TraceOn',
   webDir: 'dist',
   plugins: {
-    LocalNotifications: { iconColor: '#fbbf24' },
+    LocalNotifications: { iconColor: '#fbbf24', smallIcon: 'ic_stat_traceon' },
   },
   ios: { backgroundColor: '#111317' },
   android: { backgroundColor: '#111317' },
