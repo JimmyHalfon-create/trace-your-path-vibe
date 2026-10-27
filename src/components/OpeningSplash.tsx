@@ -6,8 +6,8 @@ import { t } from "@/lib/i18n";
 let shown = false;
 export const shouldShowSplash = () => !shown;
 
-const SHIELD =
-  "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z";
+// New TraceOn mark: open ring with a dot nestled in the opening.
+const RING = "M 81.9 43.4 A 34 34 0 1 1 55.9 21.5";
 
 const OpeningSplash = ({ onDone }: { onDone: () => void }) => {
   const done = useRef(onDone);
@@ -27,14 +27,18 @@ const OpeningSplash = ({ onDone }: { onDone: () => void }) => {
     >
       <div className="relative flex h-20 w-20 items-center justify-center">
         <span className="splash-wave absolute inset-0 rounded-full border border-primary" />
-        <svg viewBox="0 0 24 24" className="h-16 w-16" fill="none">
+        <svg viewBox="0 0 100 100" className="h-16 w-16" fill="none">
           <path
-            d={SHIELD}
+            d={RING}
             pathLength={1}
             className="splash-shield stroke-primary"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth={14}
+          />
+          <circle
+            cx={74.2}
+            cy={24.7}
+            r={11.2}
+            className="splash-dot fill-primary"
           />
         </svg>
       </div>
