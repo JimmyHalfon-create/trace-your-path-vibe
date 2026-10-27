@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 // Privacy policy content, in French and English, following the phone language
 // (same rule as src/lib/i18n.ts).
@@ -97,7 +97,14 @@ const Privacy = () => {
         </Link>
 
         <div className="mb-8 flex items-center gap-3">
-          <Shield className="h-8 w-8 text-primary" />
+          <svg viewBox="0 0 100 100" className="h-9 w-9" fill="none" aria-hidden="true">
+            <path
+              d="M 81.9 43.4 A 34 34 0 1 1 55.9 21.5"
+              className="stroke-primary"
+              strokeWidth={14}
+            />
+            <circle cx={74.2} cy={24.7} r={11.2} className="fill-primary" />
+          </svg>
           <div>
             <h1 className="text-2xl font-bold tracking-wide text-primary">{c.title}</h1>
             <p className="text-xs text-muted-foreground">{c.updated}</p>
