@@ -4,6 +4,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import Support from "./pages/Support";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
@@ -28,6 +29,7 @@ const App = () => (
         <Route path="/" element={isApp ? <Index /> : <Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/support" element={<Support />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

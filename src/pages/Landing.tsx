@@ -16,6 +16,7 @@ const copies = {
     storeAlt: "Télécharger TraceOn sur l'App Store",
     playAlt: "Télécharger TraceOn sur Google Play",
     privacy: "Confidentialité",
+    support: "Assistance",
   },
   en: {
     tagline: "Some words belong to a place.",
@@ -29,6 +30,7 @@ const copies = {
     storeAlt: "Download TraceOn on the App Store",
     playAlt: "Download TraceOn on Google Play",
     privacy: "Privacy",
+    support: "Support",
   },
 } as const;
 
@@ -85,6 +87,8 @@ const Landing = () => {
       </section>
       <footer className="pb-10 text-center text-xs text-muted-foreground">
         <Link to="/privacy" className="underline-offset-2 hover:underline">{copy.privacy}</Link>
+        <span className="mx-2">·</span>
+        <Link to="/support" className="underline-offset-2 hover:underline">{copy.support}</Link>
         <span className="mx-2">·</span>© TraceOn
       </footer>
     </main>
