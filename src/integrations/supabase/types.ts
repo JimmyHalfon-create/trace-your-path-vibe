@@ -198,6 +198,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      reserve_trace_read: { Args: { _ip_hash: string }; Returns: boolean }
       restore_trace: { Args: { _trace_id: string }; Returns: undefined }
       submit_trace_report: {
         Args: { _reason?: string; _reporter_key: string; _trace_id: string }

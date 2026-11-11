@@ -1,9 +1,10 @@
 # Feuille de route
 
 ## Sécurité — demande actuelle
-- [ ] Refuser le dépôt texte si l’analyse IA est absente, en panne ou invalide ; tester les cas de refus.
-- [ ] Mettre à jour les dépendances vulnérables et vérifier les versions verrouillées.
-- [ ] Tester les limites de lecture aux seuils et les erreurs de comptage.
+- [x] Refuser le dépôt texte si l’analyse IA est absente, en panne ou invalide ; tests de refus réussis et create-trace déployé. Dépôt réel avec IA non vérifié.
+- [x] Corriger les dépendances embarquées : aucune vulnérabilité connue sur 55 dépendances de production ; verrouillages Bun et npm synchronisés.
+- [ ] Traiter 11 alertes des outils de préparation (10 modérées, 1 élevée) — migration de l’outil Vite et compatibilité à vérifier avant changement majeur.
+- [x] Réserver les lectures atomiquement ; seuils 60/61 et 300/301 vérifiés en base avec annulation des données de test, erreurs bloquantes testées, lecture réelle 200 et distance dépassée 403 après déploiement.
 - [x] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; 13 avertissements avant, 10 après, dont 9 accès/protections intentionnels vérifiés.
 - [x] Harmoniser Confidentialité et Support en français et en anglais ; pages vérifiées sur ordinateur et téléphone, 8 tests réussis et refus des lectures publiques directes confirmé.
 - [ ] Protection contre les mots de passe compromis — blocage confirmé : nécessite Supabase Pro ; pas d’achat demandé.
@@ -22,4 +23,5 @@
 - [ ] Après les 14 jours : demander la publication
 
 ## iOS — en attente
-- [ ] Réponse d'Apple sur la soumission 1.0 (build 9, correction crash iPadOS 27) — **blocage : attend Apple**
+- [x] Build 11 approuvée pour l’App Store, non publiée ; build 13 disponible pour les testeurs externes.
+- [ ] Préparer une nouvelle build TestFlight avec les correctifs des dépendances natives — blocage : compilation et envoi sur le Mac de l’utilisateur.

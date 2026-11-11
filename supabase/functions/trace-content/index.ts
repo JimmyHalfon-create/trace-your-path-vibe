@@ -3,11 +3,10 @@
 // modified requests). This check raises the bar; it is not proof of presence.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { reserveRead } from "./read-limit.ts";
 
 const RADIUS_M = 25;
 const SIGNED_URL_SECONDS = 120;
-const READS_10MIN = 60;
-const READS_DAY = 300;
 async function hashIp(ip: string) {
   const salt = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${salt}:${ip}`));
@@ -36,16 +35,16 @@ Deno.serve(async (req) => {
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
     return json({ error: "Coordonnées invalides" }, 400);
 
-  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const url = Deno.env.get("SUPABASE_URL"), key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return json({ error: "Service indisponible" }, 503);
+  const db = createClient(url, key);
   // Ad-hoc read limit per hashed IP: slows bulk reading with spoofed coordinates.
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || req.headers.get("cf-connecting-ip") || "unknown";
   const ipHash = await hashIp(ip);
   const since = (ms: number) => new Date(Date.now() - ms).toISOString();
-  const count = async (ms: number) => (await db.from("trace_read_limits").select("id", { count: "exact", head: true })
-    .eq("ip_hash", ipHash).gte("created_at", since(ms))).count ?? 0;
-  const [c10, cDay] = await Promise.all([count(10 * 60_000), count(86_400_000)]);
-  if (c10 >= READS_10MIN || cDay >= READS_DAY) return json({ error: "Trop de lectures, réessayez plus tard" }, 429);
-  await db.from("trace_read_limits").insert({ ip_hash: ipHash });
+  const reservation = await reserveRead(() => db.rpc("reserve_trace_read", { _ip_hash: ipHash }));
+  if (reservation === "unavailable") return json({ error: "Vérification des lectures indisponible, réessayez plus tard" }, 503);
+  if (reservation === "limited") return json({ error: "Trop de lectures, réessayez plus tard" }, 429);
   if (Math.random() < 0.02) await db.from("trace_read_limits").delete().lt("created_at", since(86_400_000));
 
   const { data: t } = await db
