@@ -53,6 +53,7 @@ export type Database = {
           id: string
           reason: string | null
           reporter_key: string
+          resolved_at: string | null
           trace_id: string
         }
         Insert: {
@@ -60,6 +61,7 @@ export type Database = {
           id?: string
           reason?: string | null
           reporter_key: string
+          resolved_at?: string | null
           trace_id: string
         }
         Update: {
@@ -67,6 +69,7 @@ export type Database = {
           id?: string
           reason?: string | null
           reporter_key?: string
+          resolved_at?: string | null
           trace_id?: string
         }
         Relationships: [
@@ -176,6 +179,11 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      restore_trace: { Args: { _trace_id: string }; Returns: undefined }
+      submit_trace_report: {
+        Args: { _reason?: string; _reporter_key: string; _trace_id: string }
+        Returns: undefined
       }
     }
     Enums: {
