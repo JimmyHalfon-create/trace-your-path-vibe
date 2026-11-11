@@ -1,9 +1,9 @@
 # Feuille de route
 
 ## Sécurité — demande actuelle
-- [ ] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; recontrôler les avertissements.
+- [x] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; 13 avertissements avant, 10 après, dont 9 accès/protections intentionnels vérifiés.
 - [ ] Harmoniser Confidentialité et Support en français et en anglais ; vérifier les pages.
-- [ ] Protection contre les mots de passe compromis — vérifier les possibilités de réglage sur le Supabase externe.
+- [ ] Protection contre les mots de passe compromis — blocage : réglage hébergé du Supabase externe à activer par son propriétaire, aucun outil disponible pour le modifier ici.
 
 ## Administration — demandes actuelles
 - [x] Suspendre dès le premier signalement et permettre le rétablissement après examen ; signalements existants suspendus aussi.
