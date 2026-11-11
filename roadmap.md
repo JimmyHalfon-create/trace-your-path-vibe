@@ -1,9 +1,12 @@
 # Feuille de route
 
 ## Sécurité — demande actuelle
+- [ ] Refuser le dépôt texte si l’analyse IA est absente, en panne ou invalide ; tester les cas de refus.
+- [ ] Mettre à jour les dépendances vulnérables et vérifier les versions verrouillées.
+- [ ] Tester les limites de lecture aux seuils et les erreurs de comptage.
 - [x] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; 13 avertissements avant, 10 après, dont 9 accès/protections intentionnels vérifiés.
 - [x] Harmoniser Confidentialité et Support en français et en anglais ; pages vérifiées sur ordinateur et téléphone, 8 tests réussis et refus des lectures publiques directes confirmé.
-- [ ] Protection contre les mots de passe compromis — blocage : réglage hébergé du Supabase externe à activer par son propriétaire, aucun outil disponible pour le modifier ici.
+- [ ] Protection contre les mots de passe compromis — blocage confirmé : nécessite Supabase Pro ; pas d’achat demandé.
 
 ## Administration — demandes actuelles
 - [x] Suspendre dès le premier signalement et permettre le rétablissement après examen ; signalements existants suspendus aussi.

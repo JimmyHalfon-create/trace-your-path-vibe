@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { moderate } from "../_shared/moderation.ts";
 import { audioDuration, sniffKind } from "./audio.ts";
+import { textModeration } from "./text-moderation.ts";
 
 const MAX_TEXT = 70;
 const MAX_SECONDS = 8;
@@ -107,17 +108,10 @@ Deno.serve(async (req) => {
   // Objectionable-content filter: flagged text is hidden until an admin reviews it.
   let moderation: Record<string, unknown> = {};
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
-  if (type === "text" && apiKey) {
-    const out = await moderate(apiKey, [{ id: "new", message }]);
-    if (!("error" in out)) {
-      const r = out.results[0];
-      moderation = {
-        moderated_at: new Date().toISOString(),
-        moderation_flag: !!r?.offensive,
-        moderation_reason: r?.offensive ? (r.reason ?? "Contenu signalé").slice(0, 80) : null,
-        hidden: !!r?.offensive,
-      };
-    }
+  if (type === "text") {
+    const verdict = await textModeration(apiKey, message, moderate);
+    if (!verdict) return json({ error: "Vérification du texte indisponible, réessayez plus tard." }, 503);
+    moderation = verdict;
   }
 
   await db.from("trace_rate_limits").insert({ ip_hash: ipHash });
