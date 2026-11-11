@@ -10,7 +10,7 @@ const copies = {
     features: [
       { icon: PenLine, title: "Texte ou tag", body: "70 caractères ou un mini graffiti dessiné au doigt." },
       { icon: Mic, title: "Vocal", body: "8 secondes de voix, laissées sur place." },
-      { icon: Lock, title: "À moins de 50 m", body: "Une trace ne s'ouvre que lorsque vous êtes tout près." },
+      { icon: Lock, title: "À moins de 25 m", body: "Une trace ne s'ouvre que lorsque vous êtes tout près." },
       { icon: MapPin, title: "Anonyme", body: "Aucun compte, aucun nom, aucun suivi publicitaire." },
     ],
     storeAlt: "Télécharger TraceOn sur l'App Store",
@@ -24,7 +24,7 @@ const copies = {
     features: [
       { icon: PenLine, title: "Text or tag", body: "70 characters or a tiny graffiti drawn with your finger." },
       { icon: Mic, title: "Voice", body: "8 seconds of voice, left on the spot." },
-      { icon: Lock, title: "Within 50 m", body: "A trace only opens when you're right there." },
+      { icon: Lock, title: "Within 25 m", body: "A trace only opens when you're right there." },
       { icon: MapPin, title: "Anonymous", body: "No account, no name, no ad tracking." },
     ],
     storeAlt: "Download TraceOn on the App Store",

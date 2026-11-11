@@ -62,7 +62,7 @@ export interface LatLng {
 
 export const MAX_TEXT_LENGTH = 70;
 export const MAX_VOICE_SECONDS = 8;
-export const UNLOCK_RADIUS_METERS = 50;
+export const UNLOCK_RADIUS_METERS = 25;
 const AUDIO_BUCKET = "voice-traces";
 
 /** Haversine distance in meters. */
