@@ -11,6 +11,7 @@
 - RLS policies on `user_roles` must never query `user_roles` itself — a self-referencing policy caused infinite recursion that broke every delete; role checks go through the SECURITY DEFINER `has_role` function.
 - Explicit table grants must stay minimal: rate-limit tables are service-role only, role records are authenticated-read only, and report restoration grants only `UPDATE (resolved_at)`; retain RLS-protected admin reads and explicit marker RPC execution because removing them breaks the app rather than improving security.
 - Text creation validates a complete matching moderation verdict before insertion and returns 503 on unavailable or invalid analysis — uncertain moderation must never become publicly readable content.
+- Keep Bun and npm lockfiles synchronized after security updates and align native Capacitor packages at one patched version — local Mac installs must not reintroduce vulnerable native dependencies.
 - Recorded audio must pair a container with a codec the same platform can play back (AAC in `.mp4` on iOS, Opus in `.webm` elsewhere) — Chromium muxes Opus into `.mp4`, which Safari silently refuses to play.
 - The opening splash lives in `Index` only and shows once per JS load (module flag) — keeps it off /admin and /auth and off background resumes; GPS/notification requests wait until it ends.
 - AI moderation runs only in the admin-only `moderate-traces` edge function (verdict stored on `traces`, `moderated_at` marks analysed rows); the admin page triggers it on load and sorts flagged traces first — no AI key or prompt in the client.
