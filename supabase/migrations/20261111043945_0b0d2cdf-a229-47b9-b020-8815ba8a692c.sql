@@ -1,0 +1,1 @@
+UPDATE public.traces AS t SET hidden = true, report_count = (SELECT count(*) FROM public.trace_reports AS r WHERE r.trace_id = t.id AND r.resolved_at IS NULL) WHERE EXISTS (SELECT 1 FROM public.trace_reports AS r WHERE r.trace_id = t.id AND r.resolved_at IS NULL);

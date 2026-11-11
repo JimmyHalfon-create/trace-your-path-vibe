@@ -72,7 +72,10 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady, markerClassName
 
     map.current = m;
     onReady?.(m);
+    const resizeObserver = new ResizeObserver(() => m.resize());
+    resizeObserver.observe(container.current);
     return () => {
+      resizeObserver.disconnect();
       m.remove();
       map.current = null;
     };
@@ -199,6 +202,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady, markerClassName
     m.on("sourcedata", onSourceData);
     m.on("moveend", renderMarkers);
     m.on("zoomend", renderMarkers);
+    m.on("resize", renderMarkers);
     if (m.isStyleLoaded()) setupSource();
     else m.once("load", setupSource);
     return () => {
@@ -207,6 +211,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady, markerClassName
       m.off("sourcedata", onSourceData);
       m.off("moveend", renderMarkers);
       m.off("zoomend", renderMarkers);
+      m.off("resize", renderMarkers);
       traceMarkers.current.forEach((marker) => marker.remove());
       traceMarkers.current = [];
     };
