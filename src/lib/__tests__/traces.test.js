@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
-const calls: unknown[] = [];
-let failure: Error | null = null;
-mock.module("@/integrations/supabase/client", () => ({ supabase: { rpc: async (name: string, args: unknown) => { calls.push([name, args]); return { error: failure }; } } }));
+const calls = [];
+let failure = null;
+mock.module("@/integrations/supabase/client", () => ({ supabase: { rpc: async (name, args) => { calls.push([name, args]); return { error: failure }; } } }));
 mock.module("@/lib/i18n", () => ({ t: { locale: "fr-FR" } }));
 const { approveTrace } = await import("../traces");
 describe("admin restoration", () => {
