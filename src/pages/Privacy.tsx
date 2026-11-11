@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react";
 const fr = {
   title: "Politique de confidentialité",
   back: "Retour",
-  updated: "Dernière mise à jour : 14 octobre 2026",
-  intro: "TraceOn vous permet de laisser des messages anonymes à un endroit précis : un texte, un vocal ou un dessin (Tag). Les messages ne peuvent être lus qu'à moins de 50 mètres de l'endroit où ils ont été déposés.",
+  updated: "Dernière mise à jour : 11 novembre 2026",
+  intro: "TraceOn vous permet de laisser des messages anonymes à un endroit précis : un texte, un vocal ou un dessin (Tag). Les messages ne peuvent être lus qu'à moins de 25 mètres de l'endroit où ils ont été déposés.",
   sections: [
     {
       h: "Aucun compte, aucune donnée personnelle",
@@ -15,7 +15,7 @@ const fr = {
     },
     {
       h: "Votre position",
-      p: "L'application utilise votre position pour vous montrer les traces autour de vous et pour en déposer une. Les coordonnées d'une trace que vous déposez sont enregistrées avec elle : c'est ce qui permet de l'afficher sur la carte et de la verrouiller au-delà de 50 mètres. Votre position n'est jamais enregistrée ailleurs et n'est pas partagée.",
+      p: "L'application utilise votre position pour vous montrer les traces autour de vous et pour en déposer une. Les coordonnées d'une trace que vous déposez sont enregistrées avec elle : c'est ce qui permet de l'afficher sur la carte et de la verrouiller au-delà de 25 mètres. Votre position n'est jamais enregistrée ailleurs et n'est pas partagée.",
     },
     {
       h: "Vos traces",
@@ -31,7 +31,7 @@ const fr = {
     },
     {
       h: "Modération",
-      p: "Les traces sont vérifiées par une analyse automatique pour repérer les messages offensants, et un administrateur peut les relire et les supprimer. Les traces signalées restent lisibles uniquement à moins de 50 mètres, comme les autres.",
+      p: "Les traces sont vérifiées par une analyse automatique pour repérer les messages offensants, et un administrateur peut les relire et les supprimer. Les traces signalées restent lisibles uniquement à moins de 25 mètres, comme les autres.",
     },
     {
       h: "Suppression",
@@ -47,8 +47,8 @@ const fr = {
 const en: typeof fr = {
   title: "Privacy Policy",
   back: "Back",
-  updated: "Last updated: October 14, 2026",
-  intro: "TraceOn lets you leave anonymous messages at a specific spot: a text, a voice recording, or a drawing (Tag). Messages can only be read within 50 metres of where they were left.",
+  updated: "Last updated: November 11, 2026",
+  intro: "TraceOn lets you leave anonymous messages at a specific spot: a text, a voice recording, or a drawing (Tag). Messages can only be read within 25 metres of where they were left.",
   sections: [
     {
       h: "No account, no personal data",
@@ -56,7 +56,7 @@ const en: typeof fr = {
     },
     {
       h: "Your location",
-      p: "The app uses your location to show traces around you and to let you leave one. The coordinates of a trace you leave are stored with it: that is what places it on the map and locks it beyond 50 metres. Your location is never stored anywhere else and is not shared.",
+      p: "The app uses your location to show traces around you and to let you leave one. The coordinates of a trace you leave are stored with it: that is what places it on the map and locks it beyond 25 metres. Your location is never stored anywhere else and is not shared.",
     },
     {
       h: "Your traces",
@@ -72,7 +72,7 @@ const en: typeof fr = {
     },
     {
       h: "Moderation",
-      p: "Traces are checked by an automated analysis to flag offensive messages, and an administrator can review and delete them. Flagged traces remain readable only within 50 metres, like all others.",
+      p: "Traces are checked by an automated analysis to flag offensive messages, and an administrator can review and delete them. Flagged traces remain readable only within 25 metres, like all others.",
     },
     {
       h: "Deletion",

@@ -1,10 +1,10 @@
-// Returns a trace's content only if the caller's reported position is within 50 m.
+// Returns a trace's content only if the caller's reported position is within 25 m.
 // NOTE: the position is supplied by the device and can be spoofed (fake GPS apps,
 // modified requests). This check raises the bar; it is not proof of presence.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const RADIUS_M = 50;
+const RADIUS_M = 25;
 const SIGNED_URL_SECONDS = 120;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
