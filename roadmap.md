@@ -1,9 +1,10 @@
 # Feuille de route
 
 ## Administration — demandes actuelles
-- [ ] Suspendre dès le premier signalement et permettre le rétablissement après examen.
-- [ ] Ajouter une vue carte avec sélection des traces et état de suspension.
-- [ ] Vérifier les règles et les écrans ; accès connecté non vérifiable sur le Supabase externe.
+- [x] Suspendre dès le premier signalement et permettre le rétablissement après examen ; signalements existants suspendus aussi.
+- [x] Ajouter une vue carte avec sélection des traces et état de suspension.
+- [x] Tests de règles et vérification visuelle isolée ordinateur/téléphone, accès public protégé.
+- [ ] Vérifier le parcours complet avec un administrateur connecté — blocage : session de test indisponible sur le Supabase externe.
 
 ## Android — lancement
 - [ ] Compte développeur Google Play : identité envoyée (vérification en cours, plusieurs jours) ; reste à valider : accès à un appareil Android (vrai téléphone + app Play Console) puis numéro de téléphone — **blocage : attend Google / utilisateur**
