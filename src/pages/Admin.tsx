@@ -1,14 +1,14 @@
-import TagView from "@/components/TagView";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, Check, EyeOff, Flag, LogOut, Sparkles, Trash2, UserX } from "lucide-react";
+import { ArrowLeft, List, LogOut, Map, RefreshCw, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import AudioPlayer from "@/components/AudioPlayer";
+import AdminTraceCard from "@/components/AdminTraceCard";
+import AdminTraceMap from "@/components/AdminTraceMap";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { approveTrace, banAuthor, deleteTrace, fetchAdminTraces, formatDate, moderatePendingTraces, type AdminTrace as Trace } from "@/lib/traces";
+import { approveTrace, banAuthor, deleteTrace, fetchAdminTraces, moderatePendingTraces, type AdminTrace as Trace } from "@/lib/traces";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -16,166 +16,81 @@ const Admin = () => {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [loading, setLoading] = useState(true);
   const [analysing, setAnalysing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [view, setView] = useState<"list" | "map">("list");
+  const [filter, setFilter] = useState<"all" | "suspended" | "live">("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [focus, setFocus] = useState<Trace | null>(null);
+  const selected = traces.find((trace) => trace.id === selectedId);
+  const visible = traces.filter((trace) => filter === "all" || (filter === "suspended" ? trace.hidden : !trace.hidden));
+  const select = useCallback((trace: Trace) => setSelectedId(trace.id), []);
+  const load = useCallback(async () => { setTraces(await fetchAdminTraces()); }, []);
 
   useEffect(() => {
     if (!isAdmin) return;
-    const load = () => fetchAdminTraces().then(setTraces);
-    load()
-      .catch(() => toast.error("Impossible de charger les traces"))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    const refresh = async () => {
+      const rows = await fetchAdminTraces();
+      if (!cancelled) setTraces(rows);
+    };
+    refresh().catch(() => toast.error("Impossible de charger les traces")).finally(() => { if (!cancelled) setLoading(false); });
     setAnalysing(true);
-    moderatePendingTraces()
-      .then((n) => (n > 0 ? load() : undefined))
-      .catch((e: Error) => toast.error(e.message))
-      .finally(() => setAnalysing(false));
+    moderatePendingTraces().then((n) => n > 0 ? refresh() : undefined).catch((e: Error) => toast.error(e.message)).finally(() => { if (!cancelled) setAnalysing(false); });
+    return () => { cancelled = true; };
   }, [isAdmin]);
 
-  if (isAdmin === null) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <svg viewBox="0 0 100 100" className="h-12 w-12 animate-pulse" fill="none" aria-hidden="true">
-          <path d="M 81.9 43.4 A 34 34 0 1 1 55.9 21.5" className="stroke-primary" strokeWidth={14} />
-          <circle cx={74.2} cy={24.7} r={11.2} className="fill-primary" />
-        </svg>
-      </div>
-    );
-  }
+  if (isAdmin === null) return <div className="flex min-h-screen items-center justify-center bg-background"><p className="text-muted-foreground">Chargement…</p></div>;
   if (!isAdmin) return <Navigate to="/auth" replace />;
 
-  const remove = async (t: Trace) => {
+  const remove = async (trace: Trace) => {
     if (!confirm("Supprimer cette trace ?")) return;
-    try {
-      await deleteTrace(t);
-      setTraces((prev) => prev.filter((x) => x.id !== t.id));
-      toast.success("Trace supprimée");
-    } catch {
-      toast.error("Suppression impossible");
-    }
+    setBusy(true);
+    try { await deleteTrace(trace); setTraces((rows) => rows.filter((row) => row.id !== trace.id)); toast.success("Trace supprimée"); }
+    catch { toast.error("Suppression impossible"); }
+    finally { setBusy(false); }
   };
-
-  const approve = async (t: Trace) => {
+  const restore = async (trace: Trace) => {
+    setBusy(true);
     try {
-      await approveTrace(t.id);
-      setTraces((p) => p.map((x) => (x.id === t.id ? { ...x, hidden: false, moderation_flag: false } : x)));
-      toast.success("Trace rétablie");
-    } catch { toast.error("Action impossible"); }
+      await approveTrace(trace.id);
+      await load();
+      toast.success("Trace remise en ligne, signalements classés");
+    } catch { toast.error("Rétablissement impossible"); }
+    finally { setBusy(false); }
   };
-  const ban = async (t: Trace) => {
+  const ban = async (trace: Trace) => {
     if (!confirm("Exclure cet auteur ? Toutes ses traces seront supprimées et il ne pourra plus publier.")) return;
-    try {
-      const ids = await banAuthor(t, traces);
-      setTraces((p) => p.filter((x) => !ids.includes(x.id)));
-      toast.success(`Auteur exclu, ${ids.length} trace(s) supprimée(s)`);
-    } catch (e) { toast.error((e as Error).message); }
+    setBusy(true);
+    try { const ids = await banAuthor(trace, traces); setTraces((rows) => rows.filter((row) => !ids.includes(row.id))); toast.success(`Auteur exclu, ${ids.length} trace(s) supprimée(s)`); }
+    catch (error) { toast.error((error as Error).message); }
+    finally { setBusy(false); }
   };
-
-  const logout = async () => {
-    await supabase.auth.signOut();
-    navigate("/", { replace: true });
-  };
-
-  const voiceCount = traces.filter((t) => t.trace_type === "voice").length;
-  const tagCount = traces.filter((t) => t.trace_type === "tag").length;
-  const flaggedCount = traces.filter((t) => t.moderation_flag).length;
-  const stats = [
-    { label: "Total", value: traces.length },
-    { label: "Texte", value: traces.length - voiceCount - tagCount },
-    { label: "Tag", value: tagCount },
-    { label: "Vocal", value: voiceCount },
-    { label: "Signalées", value: flaggedCount },
-  ];
+  const locate = (trace: Trace) => { setFocus(trace); setSelectedId(trace.id); setView("map"); };
+  const refresh = async () => { setLoading(true); try { await load(); } catch { toast.error("Impossible de charger les traces"); } finally { setLoading(false); } };
+  const voiceCount = traces.filter((trace) => trace.trace_type === "voice").length;
+  const tagCount = traces.filter((trace) => trace.trace_type === "tag").length;
+  const stats = [{ label: "Total", value: traces.length }, { label: "Texte", value: traces.length - voiceCount - tagCount }, { label: "Tag", value: tagCount }, { label: "Vocal", value: voiceCount }, { label: "Suspendues", value: traces.filter((trace) => trace.hidden).length }];
+  const actions = { busy: busy || analysing, onRestore: restore, onRemove: remove, onBan: ban };
 
   return (
     <div className="safe-top min-h-screen bg-background px-4 pb-8">
-      <div className="mx-auto max-w-3xl space-y-4">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-            <ArrowLeft className="mr-1 h-4 w-4" /> Carte
-          </Button>
-          <h1 className="text-lg font-bold text-primary">Admin</h1>
-          <Button variant="ghost" size="sm" onClick={logout}>
-            <LogOut className="h-4 w-4" />
-          </Button>
+      <div className={`mx-auto space-y-4 ${view === "map" ? "max-w-6xl" : "max-w-3xl"}`}>
+        <header className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")}><ArrowLeft className="mr-1 h-4 w-4" />Retour</Button>
+          <h1 className="text-lg font-bold text-primary">Administration</h1>
+          <Button variant="ghost" size="icon" title="Déconnexion" aria-label="Déconnexion" onClick={async () => { await supabase.auth.signOut(); navigate("/", { replace: true }); }}><LogOut className="h-4 w-4" /></Button>
+        </header>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">{stats.map((stat) => <Card key={stat.label} className="p-3 text-center"><p className={`text-2xl font-bold ${stat.label === "Suspendues" && stat.value ? "text-destructive" : "text-primary"}`}>{stat.value}</p><p className="text-xs text-muted-foreground">{stat.label}</p></Card>)}</div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+          <div className="flex gap-1" role="group" aria-label="Affichage"><Button size="sm" variant={view === "list" ? "default" : "outline"} aria-pressed={view === "list"} onClick={() => setView("list")}><List className="mr-1 h-4 w-4" />Liste</Button><Button size="sm" variant={view === "map" ? "default" : "outline"} aria-pressed={view === "map"} onClick={() => { setFocus(null); setView("map"); }}><Map className="mr-1 h-4 w-4" />Carte</Button></div>
+          <div className="flex flex-wrap items-center gap-1" role="group" aria-label="État des traces">{([{ value: "all", label: "Toutes" }, { value: "suspended", label: "Suspendues" }, { value: "live", label: "En ligne" }] as const).map((option) => <Button key={option.value} size="sm" variant={filter === option.value ? "secondary" : "ghost"} aria-pressed={filter === option.value} onClick={() => { setFilter(option.value); setSelectedId(null); setFocus(null); }}>{option.label}</Button>)}<Button variant="ghost" size="icon" title="Actualiser" aria-label="Actualiser" disabled={loading || busy} onClick={refresh}><RefreshCw className="h-4 w-4" /></Button></div>
         </div>
-
-        <div className="grid grid-cols-5 gap-2">
-          {stats.map((s) => (
-            <Card key={s.label} className="p-3 text-center">
-              <p className={`text-2xl font-bold ${s.label === "Signalées" && s.value ? "text-destructive" : "text-primary"}`}>{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </Card>
-          ))}
-        </div>
-
-        {analysing && (
-          <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" /> Analyse IA des nouvelles traces…
-          </p>
-        )}
-
-        {loading ? (
-          <p className="py-8 text-center text-muted-foreground">Chargement...</p>
-        ) : traces.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">Aucune trace</p>
-        ) : (
-          traces.map((t) => (
-            <Card key={t.id} className={`flex items-start gap-3 p-4 ${t.moderation_flag || t.report_count > 0 ? "border-destructive/60 bg-destructive/5" : ""}`}>
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded bg-primary/15 px-2 py-0.5 font-medium text-primary">
-                    {t.trace_type === "voice" ? "Vocal" : t.trace_type === "tag" ? "Tag" : "Texte"}
-                  </span>
-                  {t.moderation_flag && (
-                    <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
-                      <AlertTriangle className="h-3 w-3" /> {t.moderation_reason ?? "Signalée"}
-                    </span>
-                  )}
-                  {t.report_count > 0 && (
-                    <span className="flex items-center gap-1 rounded bg-destructive/15 px-2 py-0.5 font-medium text-destructive">
-                      <Flag className="h-3 w-3" /> {t.report_count} signalement(s)
-                    </span>
-                  )}
-                  {t.hidden && (
-                    <span className="flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-muted-foreground">
-                      <EyeOff className="h-3 w-3" /> Masquée
-                    </span>
-                  )}
-                  <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
-                </div>
-                {t.trace_type === "tag" && t.drawing ? (
-                  <TagView drawing={t.drawing} className="w-32" />
-                ) : t.trace_type === "voice" && t.audio_url ? (
-                  <>
-                    <AudioPlayer src={t.audio_url} />
-                    {t.transcript ? (
-                      <p className="break-words text-sm italic text-muted-foreground">« {t.transcript} »</p>
-                    ) : null}
-                  </>
-                ) : (
-                  <p className="break-words text-foreground">{t.message}</p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {t.latitude.toFixed(4)}, {t.longitude.toFixed(4)}
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Button variant="destructive" size="icon" onClick={() => remove(t)} aria-label="Supprimer">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                {t.author_key && (
-                  <Button variant="outline" size="icon" onClick={() => ban(t)} aria-label="Exclure l'auteur">
-                    <UserX className="h-4 w-4" />
-                  </Button>
-                )}
-                {t.hidden && (
-                  <Button variant="outline" size="icon" onClick={() => approve(t)} aria-label="Rétablir">
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ))
-        )}
+        {analysing && <p className="flex items-center gap-2 text-xs text-muted-foreground"><Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" />Analyse IA des nouvelles traces…</p>}
+        {loading ? <p className="py-8 text-center text-muted-foreground">Chargement…</p> : view === "map" ? <>
+          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-primary" />En ligne</span><span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-destructive" />Suspendue</span><span>{visible.length} trace(s)</span></div>
+          <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]"><AdminTraceMap key={`${filter}-${focus?.id ?? "all"}`} traces={visible} onSelect={select} focus={focus} />
+          <aside className="min-w-0">{selected ? <><div className="mb-2 flex items-center justify-between"><h2 className="text-sm font-medium">Trace sélectionnée</h2><Button variant="ghost" size="icon" aria-label="Fermer la sélection" title="Fermer" onClick={() => setSelectedId(null)}><X className="h-4 w-4" /></Button></div><AdminTraceCard trace={selected} {...actions} /></> : <p className="py-4 text-sm text-muted-foreground">{visible.length ? "Aucune trace sélectionnée" : "Aucune trace"}</p>}</aside></div>
+        </> : visible.length === 0 ? <p className="py-8 text-center text-muted-foreground">Aucune trace</p> : visible.map((trace) => <AdminTraceCard key={trace.id} trace={trace} {...actions} onLocate={locate} />)}
       </div>
     </div>
   );
