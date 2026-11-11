@@ -2,7 +2,7 @@
 
 ## Sécurité — demande actuelle
 - [x] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; 13 avertissements avant, 10 après, dont 9 accès/protections intentionnels vérifiés.
-- [ ] Harmoniser Confidentialité et Support en français et en anglais ; vérifier les pages.
+- [x] Harmoniser Confidentialité et Support en français et en anglais ; pages vérifiées sur ordinateur et téléphone, 8 tests réussis et refus des lectures publiques directes confirmé.
 - [ ] Protection contre les mots de passe compromis — blocage : réglage hébergé du Supabase externe à activer par son propriétaire, aucun outil disponible pour le modifier ici.
 
 ## Administration — demandes actuelles
