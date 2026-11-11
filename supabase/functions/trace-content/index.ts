@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
     .from("traces")
     .select("id, message, latitude, longitude, trace_type, audio_path, drawing, created_at")
     .eq("id", id)
+    .eq("hidden", false)
     .maybeSingle();
   if (!t) return json({ error: "Trace introuvable" }, 404);
 
