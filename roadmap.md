@@ -1,5 +1,10 @@
 # Feuille de route
 
+## Administration — demandes actuelles
+- [ ] Suspendre dès le premier signalement et permettre le rétablissement après examen.
+- [ ] Ajouter une vue carte avec sélection des traces et état de suspension.
+- [ ] Vérifier les règles et les écrans ; accès connecté non vérifiable sur le Supabase externe.
+
 ## Android — lancement
 - [ ] Compte développeur Google Play : identité envoyée (vérification en cours, plusieurs jours) ; reste à valider : accès à un appareil Android (vrai téléphone + app Play Console) puis numéro de téléphone — **blocage : attend Google / utilisateur**
 - [ ] Préparer la build signée (keystore + signature dans `android/app/build.gradle`, AAB de release)
