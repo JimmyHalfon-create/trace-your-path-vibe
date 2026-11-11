@@ -21,9 +21,12 @@ interface Props {
   isUnlocked: (t: Trace) => boolean;
   onSelect: (t: Trace) => void;
   onReady?: (map: mapboxgl.Map) => void;
+  markerClassName?: (t: Trace) => string;
+  markerLabel?: (t: Trace) => string;
+  admin?: boolean;
 }
 
-const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
+const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady, markerClassName, markerLabel, admin = false }: Props) => {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const userMarker = useRef<mapboxgl.Marker | null>(null);
@@ -42,7 +45,8 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
       zoom: 1.5,
       attributionControl: false,
     });
-    m.keyboard.disable();
+    if (admin) m.addControl(new mapboxgl.NavigationControl(), "top-right");
+    else m.keyboard.disable();
     m.boxZoom.disable();
 
     const applyScale = () =>
@@ -130,8 +134,9 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
         el.type = "button";
         el.className = clustered
           ? "trace-cluster"
-          : `trace-marker ${trace && isUnlocked(trace) ? "is-unlocked" : "is-locked"}`;
-        el.setAttribute("aria-label", clustered ? `${properties.point_count} traces — zoomer` : "Trace");
+          : `trace-marker ${trace && isUnlocked(trace) ? "is-unlocked" : "is-locked"} ${trace && markerClassName ? markerClassName(trace) : ""}`;
+        el.setAttribute("aria-label", clustered ? `${properties.point_count} traces — zoomer` : trace && markerLabel ? markerLabel(trace) : "Trace");
+        el.title = el.getAttribute("aria-label") ?? "Trace";
         if (clustered) el.textContent = String(properties.point_count);
         el.addEventListener("click", (event) => {
           event.stopPropagation();
@@ -205,7 +210,7 @@ const TraceMap = ({ user, traces, isUnlocked, onSelect, onReady }: Props) => {
       traceMarkers.current.forEach((marker) => marker.remove());
       traceMarkers.current = [];
     };
-  }, [traces, isUnlocked, onSelect]);
+  }, [traces, isUnlocked, onSelect, markerClassName, markerLabel]);
 
   return <div ref={container} className="absolute inset-0" />;
 };

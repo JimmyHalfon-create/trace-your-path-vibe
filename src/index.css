@@ -142,6 +142,11 @@ All colors MUST be HSL.
   background: hsl(var(--muted-foreground));
   box-shadow: 0 0 8px hsl(var(--muted-foreground) / 0.5);
 }
+.admin-map { --marker-scale: 1 !important; }
+.trace-marker.is-suspended {
+  background: hsl(var(--destructive));
+  box-shadow: 0 0 0 3px hsl(var(--destructive) / 0.25);
+}
 .trace-cluster {
   min-width: 34px;
   height: 34px;

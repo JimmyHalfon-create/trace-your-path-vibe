@@ -130,9 +130,13 @@ export async function createTrace(
 // ---------- Admin (RLS: admin role only) ----------
 
 export async function fetchAdminTraces(): Promise<AdminTrace[]> {
-  const { data, error } = await supabase.from("traces").select("*").order("created_at", { ascending: false });
-  if (error) throw error;
-  const rows = data ?? [];
+  const rows = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await supabase.from("traces").select("*").order("created_at", { ascending: false }).order("id").range(offset, offset + 999);
+    if (error) throw error;
+    rows.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+  }
   const paths = rows.map((r) => r.audio_path).filter((p): p is string => !!p);
   const urls = new Map<string, string>();
   if (paths.length) {
@@ -164,7 +168,7 @@ export async function deleteTrace(trace: AdminTrace): Promise<void> {
 }
 
 export async function approveTrace(id: string): Promise<void> {
-  const { error } = await supabase.from("traces").update({ hidden: false, moderation_flag: false }).eq("id", id);
+  const { error } = await supabase.rpc("restore_trace", { _trace_id: id });
   if (error) throw error;
 }
 
