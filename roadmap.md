@@ -1,5 +1,10 @@
 # Feuille de route
 
+## Sécurité — demande actuelle
+- [ ] Réduire les droits inutiles sans supprimer les accès nécessaires à la carte et à l’administration ; recontrôler les avertissements.
+- [ ] Harmoniser Confidentialité et Support en français et en anglais ; vérifier les pages.
+- [ ] Protection contre les mots de passe compromis — vérifier les possibilités de réglage sur le Supabase externe.
+
 ## Administration — demandes actuelles
 - [x] Suspendre dès le premier signalement et permettre le rétablissement après examen ; signalements existants suspendus aussi.
 - [x] Ajouter une vue carte avec sélection des traces et état de suspension.
