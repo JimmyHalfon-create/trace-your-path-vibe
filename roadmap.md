@@ -16,7 +16,7 @@
 - [ ] Vérifier le parcours complet avec un administrateur connecté — blocage : session de test indisponible sur le Supabase externe.
 
 ## Android — lancement
-- [ ] Compte développeur Google Play : identité envoyée (vérification en cours, plusieurs jours) ; reste à valider : accès à un appareil Android (vrai téléphone + app Play Console) puis numéro de téléphone — **blocage : attend Google / utilisateur**
+- [ ] Compte développeur Google Play : identité envoyée (vérification en cours, plusieurs jours) ; téléphone Android récupéré le 16/11 — prochaine étape : installer l'app Google Play Console sur ce téléphone et s'y connecter avec le compte développeur, puis valider le numéro de téléphone — **blocage : attend Google / utilisateur**
 - [ ] Préparer la build signée (keystore + signature dans `android/app/build.gradle`, AAB de release)
 - [ ] Créer l'app dans la Play Console (nom, description, URL confidentialité https://trace-on.app/privacy, captures)
 - [ ] Programme de test fermé : 12 testeurs minimum, inscrits 14 jours d'affilée — **blocage : attend la liste d'e-mails de l'utilisateur**
