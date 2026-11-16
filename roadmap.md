@@ -17,9 +17,10 @@
 
 ## Android — lancement
 - [ ] Compte développeur Google Play : app créée le 16/11 (nom TraceOn, package `com.jimmy.traceyourpath`, française, gratuite) ; reste la confirmation d'identité demandée par la console et la validation du numéro de téléphone — **blocage : attend Google / utilisateur**
-- [ ] Terminer la configuration exigée avant tout test fermé : fiche Play Store (nom, descriptions, icône 512, visuel 1024×500, 2 captures), politique de confidentialité https://trace-on.app/privacy, public 18+, classification, sécurité des données — contenu prêt dans `/mnt/documents/Play-Store-TraceOn-a-remplir.md`
-- [ ] Passer `compileSdkVersion` et `targetSdkVersion` de 35 à 36 dans `android/variables.gradle` (exigence Google depuis le 31/08/2026) et vérifier l'app
-- [ ] Préparer la build signée (keystore + signature dans `android/app/build.gradle`, AAB de release)
+- [x] Images de la fiche : icône 512, visuel 1024×500 et 4 captures téléphone 1080×1920 (carte, trace vocale, Signaler/Masquer/Bloquer, règles) prêtes dans `/mnt/documents/play-store/`
+- [x] Passer `compileSdkVersion` et `targetSdkVersion` de 35 à 36 dans `android/variables.gradle` (exigence Google depuis le 31/08/2026)
+- [x] Configurer la signature : `android/app/build.gradle` lit `android/keystore.properties` (ignoré par git) et signe le build release
+- [ ] Créer le keystore d'envoi, renseigner `android/keystore.properties`, générer `app-release.aab` avec `./gradlew bundleRelease` et le téléverser — **blocage : exécution sur le Mac de l'utilisateur**
 - [ ] Programme de test fermé : 12 testeurs minimum, inscrits 14 jours d'affilée — **blocage : attend la liste d'e-mails de l'utilisateur**
 - [ ] Après les 14 jours : demander la publication
 
