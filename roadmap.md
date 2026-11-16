@@ -16,9 +16,10 @@
 - [ ] Vérifier le parcours complet avec un administrateur connecté — blocage : session de test indisponible sur le Supabase externe.
 
 ## Android — lancement
-- [ ] Compte développeur Google Play : identité envoyée (vérification en cours, plusieurs jours) ; téléphone Android récupéré le 16/11 — prochaine étape : installer l'app Google Play Console sur ce téléphone et s'y connecter avec le compte développeur, puis valider le numéro de téléphone — **blocage : attend Google / utilisateur**
+- [ ] Compte développeur Google Play : app créée le 16/11 (nom TraceOn, package `com.jimmy.traceyourpath`, française, gratuite) ; reste la confirmation d'identité demandée par la console et la validation du numéro de téléphone — **blocage : attend Google / utilisateur**
+- [ ] Terminer la configuration exigée avant tout test fermé : fiche Play Store (nom, descriptions, icône 512, visuel 1024×500, 2 captures), politique de confidentialité https://trace-on.app/privacy, public 18+, classification, sécurité des données — contenu prêt dans `/mnt/documents/Play-Store-TraceOn-a-remplir.md`
+- [ ] Passer `compileSdkVersion` et `targetSdkVersion` de 35 à 36 dans `android/variables.gradle` (exigence Google depuis le 31/08/2026) et vérifier l'app
 - [ ] Préparer la build signée (keystore + signature dans `android/app/build.gradle`, AAB de release)
-- [ ] Créer l'app dans la Play Console (nom, description, URL confidentialité https://trace-on.app/privacy, captures)
 - [ ] Programme de test fermé : 12 testeurs minimum, inscrits 14 jours d'affilée — **blocage : attend la liste d'e-mails de l'utilisateur**
 - [ ] Après les 14 jours : demander la publication
 
