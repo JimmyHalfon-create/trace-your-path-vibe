@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+// Upload key for Google Play. Lives in keystore.properties, which is git-ignored.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace "com.jimmy.traceyourpath"
     compileSdk rootProject.ext.compileSdkVersion
