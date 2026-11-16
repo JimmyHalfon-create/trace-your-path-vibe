@@ -16,11 +16,14 @@
 - [ ] Vérifier le parcours complet avec un administrateur connecté — blocage : session de test indisponible sur le Supabase externe.
 
 ## Android — lancement
-- [ ] Compte développeur Google Play : app créée le 16/11 (nom TraceOn, package `com.jimmy.traceyourpath`, française, gratuite) ; reste la confirmation d'identité demandée par la console et la validation du numéro de téléphone — **blocage : attend Google / utilisateur**
+- [x] Compte développeur Google Play : identité validée, app créée le 16/11 (nom TraceOn, package `com.jimmy.traceyourpath`, française, gratuite)
 - [x] Images de la fiche : icône 512, visuel 1024×500 et 4 captures téléphone 1080×1920 (carte, trace vocale, Signaler/Masquer/Bloquer, règles) prêtes dans `/mnt/documents/play-store/`
 - [x] Passer `compileSdkVersion` et `targetSdkVersion` de 35 à 36 dans `android/variables.gradle` (exigence Google depuis le 31/08/2026)
 - [x] Configurer la signature : `android/app/build.gradle` lit `android/keystore.properties` (ignoré par git) et signe le build release
-- [ ] Créer le keystore d'envoi, renseigner `android/keystore.properties`, générer `app-release.aab` avec `./gradlew bundleRelease` et le téléverser — **blocage : exécution sur le Mac de l'utilisateur**
+- [x] Keystore d'envoi créé, `android/keystore.properties` renseigné, `app-release.aab` signé généré et téléversé en tests internes
+- [x] Tests internes publiés et vérifiés sur le téléphone Android de l'utilisateur
+- [ ] Fiche principale : téléverser les 4 captures et coller les textes du document `Play-Store-TraceOn-a-remplir.md`, puis enregistrer
+- [ ] Lancer le test fermé : même fichier `.aab`, liste d'au moins 12 testeurs, lien d'invitation accepté par chacun
 - [ ] Programme de test fermé : 12 testeurs minimum, inscrits 14 jours d'affilée — **blocage : attend la liste d'e-mails de l'utilisateur**
 - [ ] Après les 14 jours : demander la publication
 
