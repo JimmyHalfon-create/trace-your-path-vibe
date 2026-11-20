@@ -23,7 +23,8 @@
 - [x] Keystore d'envoi créé, `android/keystore.properties` renseigné, `app-release.aab` signé généré et téléversé en tests internes
 - [x] Tests internes publiés et vérifiés sur le téléphone Android de l'utilisateur
 - [ ] Fiche principale : téléverser les 4 captures et coller les textes du document `Play-Store-TraceOn-a-remplir.md`, puis enregistrer
-- [ ] Lancer le test fermé : même fichier `.aab`, liste d'au moins 12 testeurs, lien d'invitation accepté par chacun
+- [x] `app-release.aab` régénéré en versionCode 2, signé, `BUILD SUCCESSFUL` (20/11)
+- [ ] Lancer le test fermé : importer le `.aab` versionCode 2 dans Tests et publication → Tests → Testeurs → Test fermé, créer la release, publier
 - [ ] Programme de test fermé : 12 testeurs minimum, inscrits 14 jours d'affilée — **blocage : attend la liste d'e-mails de l'utilisateur**
 - [ ] Après les 14 jours : demander la publication
 
