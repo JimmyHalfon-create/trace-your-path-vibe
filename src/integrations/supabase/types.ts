@@ -29,6 +29,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_devices: {
+        Row: {
+          author_key: string
+          lang: string
+          latitude: number
+          longitude: number
+          platform: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          author_key: string
+          lang?: string
+          latitude: number
+          longitude: number
+          platform: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          author_key?: string
+          lang?: string
+          latitude?: number
+          longitude?: number
+          platform?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       trace_rate_limits: {
         Row: {
           created_at: string

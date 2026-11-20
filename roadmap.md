@@ -31,4 +31,5 @@
 - [x] Build 11 approuvée pour l’App Store, non publiée ; build 13 disponible pour les testeurs externes.
 - [ ] Préparer une nouvelle build TestFlight avec les correctifs des dépendances natives — blocage : compilation et envoi sur le Mac de l’utilisateur.
 
-- [ ] Notifications app fermée : localisation en arrière-plan + envoi serveur (clé Apple enregistrée ; bloqué : projet Firebase à fournir, nouvelle build iOS/Android)
+- [x] Notifications app fermée : envoi serveur aux téléphones proches (300 m de la dernière position connue)
+- [ ] Activer sur les téléphones — blocage : capacité Push dans Xcode, `google-services.json` dans `android/app`, nouvelles builds sur le Mac

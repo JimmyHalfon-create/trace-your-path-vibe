@@ -3,6 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { moderate } from "../_shared/moderation.ts";
 import { audioDuration, sniffKind } from "./audio.ts";
 import { textModeration } from "./text-moderation.ts";
+import { notifyNearby } from "../_shared/push.ts";
 
 const MAX_TEXT = 70;
 const MAX_SECONDS = 8;
@@ -128,6 +129,11 @@ Deno.serve(async (req) => {
 
   // Housekeeping: forget rate-limit entries older than 1 day.
   await db.from("trace_rate_limits").delete().lt("created_at", since(86_400_000));
+
+  // Alert nearby phones (even with the app closed). Hidden traces never trigger an alert.
+  if (!moderation.hidden) {
+    try { await notifyNearby(db, { id: data.id, lat, lng, authorKey }); } catch (e) { console.error("notify", e); }
+  }
 
   return json({ id: data.id });
 });

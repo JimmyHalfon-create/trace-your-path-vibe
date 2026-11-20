@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type mapboxgl from "mapbox-gl";
 import { Loader2, MapPinOff, MessageSquare, Navigation, Plus, Shield } from "lucide-react";
@@ -10,6 +10,7 @@ import TraceComposer from "@/components/TraceComposer";
 import TraceDetail from "@/components/TraceDetail";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useNearbyTraces, useTraces } from "@/hooks/useTraces";
+import { syncPushPosition } from "@/lib/push";
 import OpeningSplash, { shouldShowSplash } from "@/components/OpeningSplash";
 import { CONTACT_EMAIL, t } from "@/lib/i18n";
 import TermsGate, { termsAccepted } from "@/components/TermsGate";
@@ -23,6 +24,7 @@ const Index = () => {
   const { position, error: geoError, refresh } = useGeolocation(!splash && !terms);
   const { traces, loading, reload, remove } = useTraces();
   const nearby = useNearbyTraces(position, traces, !splash && !terms);
+  useEffect(() => { void syncPushPosition(position); }, [position]);
   const [composing, setComposing] = useState(false);
   const [selected, setSelected] = useState<Trace | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

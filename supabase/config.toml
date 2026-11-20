@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.moderate-traces]
 verify_jwt = false
+
+[functions.register-push]
+verify_jwt = false
