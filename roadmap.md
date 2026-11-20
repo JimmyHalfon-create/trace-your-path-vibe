@@ -30,3 +30,5 @@
 ## iOS — en attente
 - [x] Build 11 approuvée pour l’App Store, non publiée ; build 13 disponible pour les testeurs externes.
 - [ ] Préparer une nouvelle build TestFlight avec les correctifs des dépendances natives — blocage : compilation et envoi sur le Mac de l’utilisateur.
+
+- [ ] Notifications app fermée : localisation en arrière-plan + envoi serveur (bloqué : clés Apple APNs / Firebase à fournir, nouvelle build iOS/Android)
